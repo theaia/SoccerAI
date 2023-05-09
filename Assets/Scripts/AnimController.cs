@@ -21,7 +21,6 @@ public class AnimController : MonoBehaviour
     private int currentFrame;
     private int currentAnimFrame;
     private List<Sprite> activeAnim;
-    [SerializeField] int frameRate;
     private SpriteRenderer spriteRenderer;
     [SerializeField] List<Sprite> up;
     [SerializeField] List<Sprite> rightUp;
@@ -40,6 +39,7 @@ public class AnimController : MonoBehaviour
 	}
 	private void Start() {
         spriteRenderer.sprite = idle[0];
+        GetComponentInParent<Player>().SetAnimController(this);
 	}
 
     public State GetAnimState() {
@@ -48,7 +48,7 @@ public class AnimController : MonoBehaviour
 
 	private void Update() {
         currentFrame++;
-        if (currentFrame >= frameRate) {
+        if (currentFrame >= GameManager.Instance.animFrameRate && activeAnim != null) {
             currentAnimFrame = currentAnimFrame == activeAnim.Count - 1 ? 0 : currentAnimFrame + 1;
             spriteRenderer.sprite = activeAnim[currentAnimFrame];
             currentFrame = 0;

@@ -8,6 +8,10 @@ TagManager:
   - stadium
   - goal
   - player
+  - home
+  - away
+  - homegoal
+  - awaygoal
   layers:
   - Default
   - TransparentFX
@@ -18,9 +22,9 @@ TagManager:
   - Player
   - BallCarrier
   - Ball
-  - 
-  - 
-  - 
+  - Goal
+  - Stadium
+  - Aura
   - 
   - 
   - 
