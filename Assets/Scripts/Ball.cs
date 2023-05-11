@@ -24,6 +24,7 @@ public class Ball : MonoBehaviour
 	private Player lastTouch;
 	private Player lastShot;
 	private Vector2? shotVector;
+	bool canPickup;
 
 	private float timeout = 25f;
 	private float timer;
@@ -39,6 +40,7 @@ public class Ball : MonoBehaviour
 	}
 
 	public void Reset() {
+		SetBallCarrier(null);
 		timer = 0;
 		col.enabled = false;
 		transform.position = new Vector2(.004f, 0f);
@@ -50,9 +52,12 @@ public class Ball : MonoBehaviour
 		lastShot = null;
 		lastTouch = null;
 		shotVector = null;
-		SetBallCarrier(null);
+		canPickup = true;
 	}
 	public void SetBallCarrier(Player _value) {
+		if (!GameManager.Instance.GetCanMove()) {
+			return;
+		}
 		//Register Pass & Giveaway
 		if (/*shotVector != null &&*/ _value && lastShot) {
 			if (lastShot.GetTeam() == _value.GetTeam() && lastShot != _value) {
@@ -167,7 +172,16 @@ public class Ball : MonoBehaviour
 		SetBallCarrier(null);
 		rb.AddForce(_force);
 		shotVector = rb.velocity.normalized;
+		if (rb.velocity.magnitude > 50f) { //Don't allow players to pickup the ball of it's shot as a high velocity
+			canPickup = false;
+			Invoke("EnableCanPickup", GameManager.Instance.ShotCooldown);
+		}
 	}
+
+	private void EnableCanPickup() {
+		canPickup = true;
+	}
+
 
 	private void OnCollisionEnter2D(Collision2D collision) {
 		if(GameManager.Instance.GetGameState() == GameState.Kickoff) {

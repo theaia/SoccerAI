@@ -3,11 +3,9 @@ using System.Collections;
 // Note this line, if it is left out, the script won't know that the class 'Path' exists and it will throw compiler errors
 // This line should always be present at the top of scripts which use pathfinding
 using Pathfinding;
-using Pathfinding.RVO;
 
 public class AIAstar : MonoBehaviour {
-    private Vector3 targetPosition;
-    private bool positionHasBeenSet;
+    private Vector2? targetPosition = null;
     Seeker seeker;
     Player player;
     Path path;
@@ -25,17 +23,20 @@ public class AIAstar : MonoBehaviour {
         player = GetComponent<Player>();
     }
 
+    public void CancelCurrentPath() {
+        targetPosition = null;
+	}
+
     public void SetTarget(Vector2 _targetPosition) {
-        if(Vector2.Distance(_targetPosition, targetPosition) < .01f) {
+        if(targetPosition.HasValue && Vector2.Distance(_targetPosition, targetPosition.Value) < .01f) {
             return;
 		}
         targetPosition = _targetPosition;
-        positionHasBeenSet = true;
-        SetDesintation(targetPosition);
+        GoToTargetPosition();
     }
 
 	private void Update() {
-		if (!positionHasBeenSet) {
+		if (targetPosition == null) {
             return;
 		}
         ProcessPath();
@@ -54,7 +55,7 @@ public class AIAstar : MonoBehaviour {
 
     public void Repath() {
         Debug.Log("Repath");
-        SetDesintation(targetPosition);
+        GoToTargetPosition();
     }
 
 	private void ProcessPath() {
@@ -63,7 +64,7 @@ public class AIAstar : MonoBehaviour {
 
             // Start a new path to the targetPosition, call the the OnPathComplete function
             // when the path has been calculated (which may take a few frames depending on the complexity)
-            seeker.StartPath(transform.position, targetPosition, OnPathComplete);
+            seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
         }
 
         if (path == null) {
@@ -87,6 +88,7 @@ public class AIAstar : MonoBehaviour {
                     // Set a status variable to indicate that the agent has reached the end of the path.
                     // You can use this to trigger some special code if your game requires that.
                     reachedEndOfPath = true;
+                    targetPosition = null;
                     break;
                 }
             } else {
@@ -98,8 +100,8 @@ public class AIAstar : MonoBehaviour {
         // Normalize it so that it has a length of 1 world unit
     }
 
-    private void SetDesintation(Vector2 _desintation) {
-        seeker.StartPath(transform.position, targetPosition, OnPathComplete);
+    private void GoToTargetPosition() {
+        if(seeker != null && path != null) seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
     }
 
     public void SprintUntilTargetReached(Vector2 _target) {

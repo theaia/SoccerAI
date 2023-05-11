@@ -24,6 +24,29 @@ public static class Utils{
         return closestDirection;
     }
 
+    public static int InputToDir(Vector2 _input) {
+        Debug.Log("Input to dir " + _input);
+        if (_input == Vector2.up) {
+            return 0;
+        } else if (_input == new Vector2(0.707f, 0.707f) || _input == new Vector2(1f, 1f)) {
+            return 1;
+        } else if (_input == Vector2.right) {
+            return 2;
+        } else if (_input == new Vector2(0.707f, -0.707f) || _input == new Vector2(1f, -1f)) {
+            return 3;
+        } else if (_input == Vector2.down) {
+            return 4;
+        } else if (_input == new Vector2(-0.707f, -0.707f) || _input == new Vector2(-1f, -1f)) {
+            return 5;
+        } else if (_input == Vector2.left) {
+            return 6;
+        } else if (_input == new Vector2(-0.707f, 0.707f) || _input == new Vector2(-1f, 1f)) {
+            return 7;
+        } else {
+            return -1;
+		}
+    }
+
     public static Vector2 IntDirToInput(int dir) {
         switch (dir) {
             default:
@@ -38,11 +61,11 @@ public static class Utils{
                 return new Vector2(0.707f, -0.707f); ;
             case 4:
                 return Vector2.down;
-            case 6:
+            case 5:
                 return new Vector2(-0.707f, -0.707f); ;
-            case 7:
+            case 6:
                 return Vector2.left;
-            case 8:
+            case 7:
                 return new Vector2(-0.707f, 0.707f); ;
         }
     }
@@ -54,6 +77,15 @@ public static class Utils{
             return new List<int>{ 5, 6, 7 };
         }
     }
+
+    public static List<int> GetBackwardDirsPerTeam(Team _team) {
+        if (_team == Team.Home) {
+            return new List<int> { 5, 6, 7 };
+        } else {
+            return new List<int> { 1, 2, 3 };
+        }
+    }
+
     public static int GetForwardDirPerTeam(Team _team) {
         if (_team == Team.Home) {
             return 2;
@@ -62,9 +94,12 @@ public static class Utils{
         }
     }
 
-    public static RaycastHit2D GetDirectionInfo(Vector2 _origin, int _value) {
-        RaycastHit2D _hit = Physics2D.CircleCast(_origin, .05f, IntDirToInput(_value), float.PositiveInfinity, ~0);
-        return _hit;
+    public static RaycastHit2D[] GetDirectionInfo(Vector2 _origin, int _value) {
+        Vector2 _input = IntDirToInput(_value);
+        //Debug.DrawRay(_origin, _input, Color.red);
+        Debug.DrawLine(_origin, _origin + (_input * 1f), Color.red, .1f);
+        RaycastHit2D[] _hits = Physics2D.RaycastAll(_origin, _input, 1f, GameManager.Instance.DirectionLayersToCheck);
+        return _hits;
     }
 
     public static int GetRandomCollisionWithTag(Vector2 _origin, string _tag, List<int> _dirs = null) {
@@ -74,15 +109,17 @@ public static class Utils{
         _dirs = RandomSortList(_dirs);
 
         foreach (int _dir in _dirs) {
-            RaycastHit2D _hit = GetDirectionInfo(_origin, _dir);
-            if (_hit.collider != null && _hit.collider.gameObject.CompareTag(_tag)) {
-                return _dir;
+            RaycastHit2D[] _hits = GetDirectionInfo(_origin, _dir);
+            foreach (RaycastHit2D _hit in _hits) {
+                if (_hit.collider != null && _hit.collider.gameObject.CompareTag(_tag)) {
+                    return _dir;
+                }
             }
         }
         return -1; //Default return value if none found
 	}
 
-    public static int GetRandomCollisionWithoutTag(Vector2 _origin, string _tag, List<int> _dirs = null) {
+    /*public static int GetRandomCollisionWithoutTags(Vector2 _origin, string[] _tags, List<int> _dirs = null) {
         if (_dirs == null) {
             _dirs = GetAllDirections();
         }
@@ -90,12 +127,94 @@ public static class Utils{
         _dirs = RandomSortList(_dirs);
 
         foreach (int _dir in _dirs) {
-            RaycastHit2D _hit = GetDirectionInfo(_origin, _dir);
-            if (_hit.collider != null && !_hit.collider.gameObject.CompareTag(_tag)) {
-                return _dir;
-            }
+            RaycastHit2D[] _hits = GetDirectionInfo(_origin, _dir);
+            foreach (RaycastHit2D _hit in _hits) {
+                if (_hit.collider != null) {
+                    for (int i = 0; i < _tags.Length; i++) {
+                        if (_hit.collider.CompareTag(_tags[i])) {
+                            return _dir;
+                        }
+                    }
+                } 
+            } 
         }
         return _dirs[Random.Range(0, _dirs.Count)]; //Default return value if none found
+    }*/
+
+    public static int GetDirWithoutTags(Player _player, string[] _perception, string[] _tags, DirectionType _dirType) {
+        List<int> _dirs = GetDirs(_player, _dirType);
+        //Debug.Log($"Randomly sorted list: {IntListToString(_dirs)}");
+        
+        for (int i = 0; i < _dirs.Count; i++) { //Loop through all dirs
+
+            bool[] _matchingTag = new bool[_tags.Length];
+
+            for (int w = 0; w < _tags.Length; w++) { //Check against every tag
+                _matchingTag[w] = _perception[_dirs[i]] == _tags[w];
+                //Debug.Log($"Looping {i} {w}");
+                if (_matchingTag[w]) {
+                    //Debug.Log($"{_tags[w]} found on loop {i} {w} in dir {_dirs[i]}. Breaking loop");
+                    break;
+                }
+
+                if(w == _tags.Length - 1) {
+                    //Debug.Log($"No tags found in direction {_dirs[i]}. Returning value");
+                    return _dirs[i];
+
+                }
+            }
+        }
+
+        //Debug.Log($"Tags found in every direction");
+        return -1; //Default return value if none found
+    }
+
+    public static int GetDirWithTags(Player _player, string[] _perception, string[] _tags, DirectionType _dirType) {
+        List<int> _dirs = GetDirs(_player, _dirType);
+        //Debug.Log($"Randomly sorted list: {IntListToString(_dirs)}");
+
+        //Debug.Log($"dirs length {_dirs.Count}. tag length {_tags.Length}. perception length {_perception.Length}");
+        for (int i = 0; i < _dirs.Count; i++) { //Loop through all dirs
+            bool[] _matchingTag = new bool[_tags.Length];
+
+            for (int w = 0; w < _tags.Length; w++) { //Check against every tag
+                _matchingTag[w] = _perception[_dirs[i]] == _tags[w];
+                //_newList.Add(_matchingTag[w] ? 1 : 0);
+                if (_matchingTag[w]) {
+                    Debug.Log($"{_matchingTag[w]} found on loop {_tags[w]} in dir {_dirs[i]}. Returning value");
+                    return _dirs[i];
+                }
+            }
+        }
+
+        Debug.Log($"Tags found in any direction");
+        return -1; //Default return value if none found
+    }
+
+    public static bool CheckDirClearOfTags(string[] _perception, string[] _tags, int _dir) {
+        if(_dir < 0 || _dir > 8) {
+            Debug.Log($"Invalid dir input {_dir}.  Returning true");
+            return true;
+        }
+        //Debug.Log($"dir {_dir}. tag length {_tags.Length}. perception length {_perception.Length}");
+        bool[] _matchingTag = new bool[_tags.Length];
+        //Debug.Log($"matching set with {_matchingTag.Length}.");
+        for (int w = 0; w < _tags.Length; w++) { //Check against every tag
+            _matchingTag[w] = _perception[_dir] == _tags[w];
+            if (_matchingTag[w]) { 
+                Debug.Log(_tags[w] + " is making the current dir not clear");
+                return false;
+            }
+        }
+
+        /*for (int z = 0; z < _matchingTag.Length; z++) {
+            if (_matchingTag[z] == true) {
+                Debug.Log(_matchingTag[z] + " is making the current dir not clear");
+                return false;
+            }
+        }*/
+        Debug.Log("Is free of objects to avoid");
+        return true;
     }
 
     public static List<int> RandomSortList(List<int> inputList) {
@@ -125,7 +244,152 @@ public static class Utils{
         return _player.GetTeam() == Team.Home ? "home" : "away";
     }
 
-    public static Vector2 GetTeamBasedLocation(Vector2 _position, Team _team) {
+    public static string GetTeamGoalTag(Player _player) {
+        return _player.GetTeam() == Team.Home ? "homegoal" : "awaygoal";
+    }
+
+    public static string GetOpponentGoalTag(Player _player) {
+        return _player.GetTeam() == Team.Home ? "awaygoal" : "homegoal";
+    }
+
+    public static Vector2 GetDefendingZoneBasedLocation(Vector2 _position, Team _team) {
         return _team == Team.Home ? new Vector2(Mathf.Abs(_position.x) * -1, _position.y) : new Vector2(Mathf.Abs(_position.x), _position.y);
     }
+
+    public static Vector2 GetAttackingZoneBasedLocation(Vector2 _position, Team _team) {
+        return _team == Team.Away ? new Vector2(Mathf.Abs(_position.x) * -1, _position.y) : new Vector2(Mathf.Abs(_position.x), _position.y);
+    }
+
+    public static float GetDistanceToNearestPlayer(Player _currentPlayer, Team? _team) {
+        float _tempClosestPlayerDistance = float.PositiveInfinity;
+        List<Player> _playersToCheckAgainst = GameManager.Instance.GetPlayers(_team);
+
+        foreach(Player _player in _playersToCheckAgainst) {
+            if(_player != _currentPlayer) {
+                float _currentDistance = Vector2.Distance(_currentPlayer.transform.position, _player.transform.position);
+                if (_currentDistance < _tempClosestPlayerDistance) {
+                    _tempClosestPlayerDistance = _currentDistance;
+                }
+            }
+		}
+
+        return _tempClosestPlayerDistance;
+	}
+
+    public static Player GetPlayerNearestBall(Team? _team = null) {
+        Player _currentClosestPlayerToBall = GameManager.Instance.GetCachedPlayerNearestBall(_team);
+
+        /*if (_currentClosestPlayerToBall != null) {
+            if(_team != null) {
+                Debug.Log($"{_currentClosestPlayerToBall.name} is closest to ball on {_team.Value}");
+            } else {
+                Debug.Log($"{_currentClosestPlayerToBall.name} is closest to ball");
+            }
+        } else {
+            Debug.Log("No closest player found");
+        }*/
+        return _currentClosestPlayerToBall;
+    }
+
+    public static bool IsV2LocationInZone(Vector2 _value, Team _team) {
+        if(_team == Team.Home) {
+            return _value.x < 0;
+        } else {
+            return _value.x > 0;
+        }
+        
+	}
+
+    public static Vector2 GetRandomInput() {
+        int _randomInput = Random.Range(0, 7);
+        return IntDirToInput(_randomInput);
+    }
+
+    public static string IntArrayToString(int[] array) {
+        if (array == null || array.Length == 0) {
+            return "";
+        }
+        string result = array[0].ToString();
+        for (int i = 1; i < array.Length; i++) {
+            result += "," + array[i].ToString();
+        }
+        return result;
+    }
+
+    public static string IntListToString(List<int> list) {
+        if (list == null || list.Count == 0) {
+            return "";
+        }
+        string result = list[0].ToString();
+        for (int i = 1; i < list.Count; i++) {
+            result += "," + list[i].ToString();
+        }
+        return result;
+    }
+
+    public static List<int> GetDirs(Player _player, DirectionType _dirType) {
+        List<int> _dirList = new List<int>();
+
+        List<int> _forwardList = new List<int>();
+        _forwardList = GetForwardDirsPerTeam(_player.GetTeam());
+        RandomSortList(_forwardList);
+
+        List<int> _neutral = new List<int>() { 0, 4 };
+        RandomSortList(_neutral);
+
+        List<int> _backward = new List<int>();
+        _backward = GetBackwardDirsPerTeam(_player.GetTeam());
+        RandomSortList(_backward);
+
+        switch (_dirType) {
+            case DirectionType.ForwardOnly:
+                _dirList.AddRange(_forwardList);
+                break;
+            case DirectionType.ForwardPreferredNeutral:
+                _dirList.AddRange(_forwardList);
+                _dirList.AddRange(_neutral);
+                break;
+            case DirectionType.ForwardPreferred:
+                _dirList.AddRange(_forwardList);
+                _dirList.AddRange(_neutral);
+                _dirList.AddRange(_backward);
+                break;
+            case DirectionType.BackwardOnly:
+                _dirList.AddRange(_backward);
+                break;
+            case DirectionType.BackwardPreferredNeutral:
+                _dirList.AddRange(_backward);
+                _dirList.AddRange(_neutral);
+                break;
+            case DirectionType.BackwardPreferred:
+                _dirList.AddRange(_backward);
+                _dirList.AddRange(_neutral);
+                _dirList.AddRange(_forwardList);
+                break;
+            case DirectionType.All:
+                _dirList = GetAllDirections();
+                RandomSortList(_dirList);
+                break;
+        }
+
+        return _dirList;
+    }
+
+    public static void DebugDir(int _dir, Vector2 _origin) {
+        if (_dir != -1) {
+            Debug.DrawLine(_origin, _origin + IntDirToInput(_dir) * GameManager.Instance.PerceptionLength, Color.green, .1f);
+        } else {
+            DebugExtension.DebugPoint(_origin, Color.red, .1f, .1f);
+        }
+    }
+}
+
+public enum DirectionType {
+    ForwardOnly,
+    ForwardPreferredNeutral,
+    ForwardPreferred,
+    BackwardOnly,
+    BackwardPreferredNeutral,
+    BackwardPreferred,
+    All
 }

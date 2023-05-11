@@ -23,9 +23,11 @@ public class GameManager : MonoBehaviour {
 	private float timer;
 	private float maxTime = 3f * 60f;
 	[SerializeField] private TextMeshProUGUI homeScoreText, awayScoreText, timerText;
+	public LayerMask DirectionLayersToCheck;
 
-	public float standardSpeed { get; private set; } = 15;
+	public float standardSpeed { get; private set; } = 15f;
 	public float sprintSpeed { get; private set; } = 20f;
+	public float returnToFormationSpeed { get; private set; } = 35f;
 	public float maxStamina { get; private set; } = 100f;
 	public float staminaRechargeRate { get; private set; } = .05f;
 	public float staminaConsumeRate { get; private set; } = .1f;
@@ -37,8 +39,9 @@ public class GameManager : MonoBehaviour {
 	public float maxChargeTime { get; private set; } = 10f;
 	public float ShotMaxStrength { get; private set; } = 100f;
 	public float ShotMinStrength { get; private set; } = 1f;
-	public float ShotCooldown { get; private set; } = 3f;
+	public float ShotCooldown { get; private set; } = 2f;
 	public int animFrameRate { get; private set; } = 24;
+	public float PerceptionLength { get; private set; } = .5f;
 	[Space(10)]
 	[SerializeField] GameObject[] HomeCharacterSprites;
 	[SerializeField] GameObject[] AwayCharacterSprites;
@@ -52,12 +55,15 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	private List<Player> homePlayers = new List<Player>();
 	private List<Player> awayPlayers = new List<Player>();
+	private List<Player> allPlayers = new List<Player>();
 	private Vector2[] homePosts;
 	private Vector2[] awayPosts;
+	private bool canMove;
+
+	private float dataCollectionRate = .1f;
+	private Player homePlayerNearestBall, awayPlayerNearestBall, playerNearestBall;
 
 	private List<Collider2D> projectedBallCollisionObjects = new List<Collider2D>();
-
-	private Player closestHomeToBall, closestAwayToBall, closestToBall;
 	private void Awake() {
 		if(Instance != null) {
 			Destroy(this);
@@ -77,11 +83,66 @@ public class GameManager : MonoBehaviour {
 		System.Random rnd = new System.Random();
 		Team randomTeam = (Team)rnd.Next(Enum.GetNames(typeof(Team)).Length);
 
-		ApplyFormations(randomTeam);
+
+		lastScoringTeam = randomTeam;
+		StartCoroutine(CollectInformation());
+		StartCoroutine(SetGameStateAfterDelay(GameState.Kickoff, .1f));
 	}
 
-	public List<Player> GetPlayers(Team _team) {
-		return _team == Team.Home ? homePlayers : awayPlayers;
+	IEnumerator CollectInformation() {
+		while (true) {
+			yield return new WaitForSeconds(dataCollectionRate);
+			UpdatePlayersNearestBall();
+		}
+	}
+
+	public Team GetLastScoringTeam() {
+		return lastScoringTeam;
+	}
+
+	private void UpdatePlayersNearestBall() {
+		float _currentClosestHomeDistanceToBall = float.PositiveInfinity;
+		float _currentClosestAwayDistanceToBall = float.PositiveInfinity;
+
+		Player _currentClosestHomePlayerToBall = null;
+		Player _currentClosestAwayPlayerToBall = null;
+
+		foreach (Player _player in homePlayers) {
+			float _currentDistance = Vector2.Distance(_player.transform.position, GetBallLocation());
+			if (_currentDistance < _currentClosestHomeDistanceToBall) {
+				_currentClosestHomeDistanceToBall = _currentDistance;
+				_currentClosestHomePlayerToBall = _player;
+			}
+		}
+
+		homePlayerNearestBall = _currentClosestHomePlayerToBall;
+
+		foreach (Player _player in awayPlayers) {
+			float _currentDistance = Vector2.Distance(_player.transform.position, GetBallLocation());
+			if (_currentDistance < _currentClosestAwayDistanceToBall) {
+				_currentClosestAwayDistanceToBall = _currentDistance;
+				_currentClosestAwayPlayerToBall = _player;
+			}
+		}
+
+		awayPlayerNearestBall = _currentClosestAwayPlayerToBall;
+
+		if(homePlayerNearestBall && awayPlayerNearestBall) {
+			playerNearestBall = _currentClosestHomeDistanceToBall < _currentClosestAwayDistanceToBall ? homePlayerNearestBall : awayPlayerNearestBall;
+		}
+
+	}
+
+	public List<Player> GetPlayers(Team? _team = null) {
+		if (_team != null) {
+			return _team == Team.Home ? homePlayers : awayPlayers;
+		} else {
+			List<Player> _combinedPlayerList = new List<Player>();
+			_combinedPlayerList.AddRange(homePlayers);
+			_combinedPlayerList.AddRange(awayPlayers);
+			return _combinedPlayerList;
+		}
+		
 	}
 
 	public GameObject GetPlayerPrefab(Team _team) {
@@ -93,8 +154,6 @@ public class GameManager : MonoBehaviour {
 		ProcessFormation(_teamKickingOff, Team.Home);
 		ProcessFormation(_teamKickingOff, Team.Away);
 	}
-
-
 
 	private void ProcessFormation(Team _teamKickingOff, Team _processTeam) {
 		Formation[] _teamFormation = _processTeam == Team.Home ? homeFormation : awayFormation;
@@ -121,7 +180,6 @@ public class GameManager : MonoBehaviour {
 
 	private void Update() {
 		UpdateTimer();
-		UpdateClosestPlayers();
 	}
 
 
@@ -192,37 +250,22 @@ public class GameManager : MonoBehaviour {
 		finalPosition = currentPosition;
 	}
 
-	private void UpdateClosestPlayers() {
-		Player _tempClosestHomePlayer = null;
-		Player _tempClosestAwayPlayer = null;
-		float _tempClosestHomeDistance = float.PositiveInfinity;
-		float _tempClosestAwayDistance = float.PositiveInfinity;
-		foreach(Player _player in homePlayers) {
-			float _currentHomeDistanceToBall = _player.GetDistanceToBall();
-			if (_tempClosestHomePlayer == null || _currentHomeDistanceToBall < _tempClosestHomeDistance) {
-				_tempClosestHomePlayer = _player;
-				_tempClosestHomeDistance = _currentHomeDistanceToBall;
-			}
+	public Player GetCachedPlayerNearestBall(Team? team = null) {
+		if (team == Team.Home) {
+			return homePlayerNearestBall;
+		} else if (team == Team.Away) {
+			return awayPlayerNearestBall;
+		} else {
+			return playerNearestBall;
 		}
-
-		foreach (Player _player in awayPlayers) {
-			float _currentAwayDistanceToBall = _player.GetDistanceToBall();
-			if (_tempClosestAwayPlayer == null || _currentAwayDistanceToBall < _tempClosestAwayDistance) {
-				_tempClosestAwayPlayer = _player;
-				_tempClosestAwayDistance = _currentAwayDistanceToBall;
-			}
-		}
-
-		closestHomeToBall = _tempClosestHomePlayer;
-		closestAwayToBall = _tempClosestAwayPlayer;
-		closestToBall = _tempClosestAwayDistance < _tempClosestHomeDistance ? _tempClosestAwayPlayer : _tempClosestHomePlayer;
 	}
-
 
 	public void Score(Team team) {
 		if(currentGameState != GameState.Playing && currentGameState != GameState.Training) {
 			return;
 		}
+
+		lastScoringTeam = team;
 
 		Player _ballCarrier = GetBallCarrier();
 		bool _wasOwnGoal = _ballCarrier ? _ballCarrier.GetTeam() != team : false;
@@ -281,10 +324,6 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 GetBallLocation() {
 		return ball.transform.position;
-	}
-
-	public void GetClosestPlayerToBall(Team? _team = null) {
-
 	}
 
 	private void UpdateTimer() {
@@ -346,21 +385,41 @@ public class GameManager : MonoBehaviour {
 
 	public void SetGameState(GameState _value) {
 		currentGameState = _value;
+		Debug.Log($"Changing game state to {currentGameState}");
 		switch (currentGameState) {
 			case GameState.Goal:
-				//5 second cele
-				//run back to center
-				StartCoroutine(SetGameStateAfterDelay(GameState.Kickoff, 6f));
+				StartCoroutine(GoalCelebration());
 				break;
 			case GameState.Kickoff:
-				ball.Reset();
+				ApplyFormations(lastScoringTeam);
+				StartCoroutine(SetGameStateAfterDelay(GameState.Playing, 3f));
+				break;
+			case GameState.Playing:
+				canMove = true;
 				break;
 		}
+	}
+
+	public bool GetCanMove() {
+		return canMove;
 	}
 
 	IEnumerator SetGameStateAfterDelay(GameState _value, float _delay) {
 		yield return new WaitForSeconds(_delay);
 		SetGameState(_value);
+	}
+
+	IEnumerator GoalCelebration() {
+		canMove = false;
+		ball.Reset();
+		yield return new WaitForSeconds(3f);
+		canMove = true;
+		float _savedSpeed = standardSpeed;
+		standardSpeed = returnToFormationSpeed;
+		ApplyFormations(lastScoringTeam);
+		yield return new WaitForSeconds(2f);
+		standardSpeed = _savedSpeed;
+		StartCoroutine(SetGameStateAfterDelay(GameState.Kickoff, .5f));
 	}
 	public GameState GetGameState() {
 		return currentGameState;
@@ -377,24 +436,7 @@ public class GameManager : MonoBehaviour {
 		} else {
 			awayPlayers.Add(_player);
 		}
-	}
-
-	public Player GetPlayerNearestBall() {
-		Player _playerNearestBall = homePlayers[0]; //default value
-		float _currentClosestDistanceToBall = float.PositiveInfinity;
-		for (int i = 0; i < homePlayers.Count; i++) {
-			if (Vector3.Distance(homePlayers[i].transform.position, ball.transform.position) < _currentClosestDistanceToBall) {
-				_playerNearestBall = homePlayers[i];
-			};
-		}
-
-		for (int i = 0; i < awayPlayers.Count; i++) {
-			if (Vector3.Distance(awayPlayers[i].transform.position, ball.transform.position) < _currentClosestDistanceToBall) {
-				_playerNearestBall = awayPlayers[i];
-			};
-		}
-
-		return _playerNearestBall;
+		allPlayers.Add(_player);
 	}
 
 	public void DrawPredictedBallStoppingLocation() {

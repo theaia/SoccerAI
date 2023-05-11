@@ -20,11 +20,15 @@ public class Player : MonoBehaviour
     private float speed = 1f;
     private float shotChargeTime;
     private bool isBallNearby;
+    private string lastCollidedObjectTagged;
+    private Vector2 formationLocation;
 
     [SerializeField] private Team team;
     [SerializeField] private PlayStyle role;
 
     private PlayerAgent agent;
+    private AIAstar aiaStar;
+    private LocalPerception localPerception;
 
     private bool canShoot = true;
 
@@ -36,6 +40,10 @@ public class Player : MonoBehaviour
     public PlayerAgent GetAgent() {
         return agent;
 	}
+
+    public AIAstar GetAIAStar() {
+        return aiaStar;
+    }
 
     public float GetSpeed() {
         return speed;
@@ -62,12 +70,13 @@ public class Player : MonoBehaviour
         return Vector2.Distance(transform.position, GameManager.Instance.GetBallLocation());
 	}
 
-	private void Start() {
-        gameObject.tag = team == Team.Home ? "home" : "away";
+	private void Awake() {
         SetTeam(team);
         m_Inputs = GetComponents<KeyboardInput>();
         rb = GetComponent<Rigidbody2D>();
         agent = GetComponent<PlayerAgent>();
+        aiaStar = GetComponent<AIAstar>();
+        localPerception = GetComponentInChildren<LocalPerception>();
 
         gameObject.name = GameManager.Instance.GetRandomName();
         stamina = GameManager.Instance.maxStamina;
@@ -77,6 +86,7 @@ public class Player : MonoBehaviour
 
     public void SetTeam(Team _team) {
         team = _team;
+        gameObject.tag = team == Team.Home ? "home" : "away";
         Instantiate(GameManager.Instance.GetRandomTeamPrefab(_team), transform);
         if (animController != null) {
             Destroy(animController.gameObject);
@@ -84,12 +94,30 @@ public class Player : MonoBehaviour
         animController = GetComponentInChildren<AnimController>();
     }
 
+    public string[] GetLocalPerception() {
+        return localPerception.GetLocalPerceptionInfo();
+    }
 
+    public string GetLocalDirPerception(int _dir) {
+        return localPerception.GetLocalPerceptionDirInfo(_dir);
+    }
     public void SetHasBall(bool _value) {
         hasBall = _value;
         gameObject.layer = hasBall ? LayerMask.NameToLayer("BallCarrier") : LayerMask.NameToLayer("Player");
-        if(!_value) UpdateChargeDisplay();
+        if (!hasBall) {
+            UpdateChargeDisplay();
+            canShoot = false;
+            Invoke("ResetCanShootTimer", GameManager.Instance.ShotCooldown);
+        }
     }
+
+    public void SetFormationLocation(Vector2 _value) {
+        formationLocation = _value;
+	}
+
+    public Vector2 GetFormationLocation() {
+        return formationLocation;
+	}
 
     public void SetMovement(Vector2 _movement) {
         inputData.Move = _movement;
@@ -152,6 +180,7 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
+        //Only do this if there are human inputs
 		if (m_Inputs == null) {
             return;
 		}
@@ -162,6 +191,10 @@ public class Player : MonoBehaviour
         ProcessInputs(inputData.Move, inputData.Ability, inputData.Sprint);
     }
 
+    public Vector2 GetCurrentMoveInput() {
+        return inputData.Move;
+	}
+
     public void GenerareNewInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
         inputData = new InputData {
             Move = _moveDir,
@@ -171,11 +204,15 @@ public class Player : MonoBehaviour
     }
 
     public void ProcessInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
-        Animate();
+        Animate(GameManager.Instance.GetGameState() == GameState.Goal && GameManager.Instance.GetLastScoringTeam() == team);
 
+		if (!GameManager.Instance.GetCanMove()) {
+            return;
+		}
+        //Debug.Log($"{gameObject.name} current move input: {_moveDir}");
         rb.velocity = _moveDir.normalized * speed * Time.fixedDeltaTime;
 
-        if (_ability) {
+        if (_ability && canShoot) {
             if (this == GameManager.Instance.GetBallCarrier()) {
                 ChargeShot();
             } else if (isBallNearby) {
@@ -265,14 +302,9 @@ public class Player : MonoBehaviour
     }
 
     private void Shoot() {
-		if (!canShoot) {
-            return;
-		}
         if (this == GameManager.Instance.GetBallCarrier()) {
             Vector2 _shot = GetDirection() * Mathf.Lerp(GameManager.Instance.ShotMinStrength, GameManager.Instance.ShotMaxStrength, shotChargeTime / GameManager.Instance.maxChargeTime);
             GameManager.Instance.ShootBall(_shot);
-            //canShoot = false;
-            //Invoke("ResetCanShootTimer", GameManager.Instance.ShotCooldown);
         }
 
         shotChargeTime = 0;
@@ -339,7 +371,16 @@ public class Player : MonoBehaviour
         return rb.velocity.magnitude;
 	}
 
-    private void Animate() {
+    private void Animate(bool _cheering = false) {
+		if (_cheering) {
+            animController.SetAnimState(State.cheer);
+            return;
+		}
+
+		if (!GameManager.Instance.GetCanMove()) {
+            return;
+		}
+
         if (inputData.Move.x == 0 && inputData.Move.y > 0) {
             animController.SetAnimState(State.up);
             if (hasBall) {
@@ -393,4 +434,16 @@ public class Player : MonoBehaviour
         }
     }
 
+
+	private void OnCollisionEnter2D(Collision2D collision) {
+        lastCollidedObjectTagged = collision.gameObject.tag;
+    }
+
+    public void ClearLastCollidedObject() {
+        lastCollidedObjectTagged = string.Empty;
+	}
+
+    public string GetLastCollidedObject() {
+        return lastCollidedObjectTagged;
+    }
 }
