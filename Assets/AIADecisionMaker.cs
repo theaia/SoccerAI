@@ -8,25 +8,32 @@ public class AIADecisionMaker : MonoBehaviour
 	Player player;
 	AIAstar aiaStar;
 
-	private bool isClearing;
 	private string[] localPerception;
+	private Player ballCarrier;
 
 	private void Awake() {
 		player = GetComponent<Player>();
 		aiaStar = GetComponent<AIAstar>();
 	}
 
-	IEnumerator Start() {
-		yield return new WaitForSeconds(1f);
+	private void Start() {
+		StopAllCoroutines();
 		StartCoroutine(MakeDecision());
 	}
 
 	IEnumerator MakeDecision() {
 		while (true) {
-			if (!GameManager.Instance || !player) {
+			if (!GameManager.Instance || !player || !GameManager.Instance.GetCanMove()) {
 				yield return null;
 			}
+
+			if (GameManager.Instance.GetIsTransitioning()) {
+				aiaStar.SetTarget(player.GetFormationLocation());
+				yield return null;
+			}
+
 			localPerception = player.GetLocalPerception();
+			ballCarrier = GameManager.Instance.GetBallCarrier();
 			switch (player.GetRole()) {
 				default:
 				case PlayStyle.Defender:
@@ -51,42 +58,53 @@ public class AIADecisionMaker : MonoBehaviour
 	#region Goalie
 	private void MakeDecisionAsGoalie() {
 		TryGetBall();
-
-		Player _ballCarrier = GameManager.Instance.GetBallCarrier();
 		//Goalie has ball
-		if (_ballCarrier == player) {
-			ClearTheBall();
+		if (ThisPlayerHasBall()) {
+			TryAttemptPass();
+			return;
 		} else {
 			//Loose ball is headed towards net
-			if (GameManager.Instance.IsBallHeadedTowardsGoal(player.GetTeam())) {
+			if (IsBallHeadedTowardsTeamGoal()) {
 				MoveToBlockBall();
-			//Ball is headed towards net
-			} else { 
+				return;
+			} else if (IsClosestOnTeamToBall() && IsBallInDefendingZone()) {
+				SprintToBall();
+				return;
+			} else {
 				GeneralGoaliePositioning();
+				return;
 			}
 		}
 
-		//Player is closest on team to loose ball or opponent with ball
-		if ((!_ballCarrier || (_ballCarrier && _ballCarrier.GetTeam() != player.GetTeam())) && Utils.GetPlayerNearestBall(player.GetTeam()) == player) {
-			SprintToBall();
-			return;
-		}
 	}
 
 	private void GeneralGoaliePositioning() {
+		player.SetSprint(false);
 		Vector2[] _postsToDefend = GameManager.Instance.GetPosts(player.GetTeam());
 		Vector2 _defendPos = Utils.V3CenterPoint(_postsToDefend[0], _postsToDefend[1], GameManager.Instance.GetBallLocation());
-		aiaStar.SprintUntilTargetReached(_defendPos);
+		aiaStar.SetTarget(_defendPos);
 	}
 	#endregion
 
 	#region Striker
 	private void MakeDecisionAsStriker() {
 		TryGetBall(true);
-
-		//If Player Nearest The Ball
-		if (GameManager.Instance.GetBallCarrier() != player && Utils.GetPlayerNearestBall(player.GetTeam()) == player) {
+		player.SetSprint(false);
+		//Player is closest on team to loose ball or opponent with ball
+		if (!TeamHasBall() && IsClosestOnTeamToBall()) {
 			MoveToBall();
+			return;
+		}
+
+		if (ThisPlayerHasBall()) {
+			player.SetSprint(player.GetCurrentStamina() > GameManager.Instance.maxStamina / 2);
+			TryAttemptShot();
+			return;
+		}
+
+		if (TeammateHasBall() || !TeamHasBall()) {
+			GoToPassingLocation();
+			return;
 		}
 	}
 	#endregion
@@ -95,11 +113,8 @@ public class AIADecisionMaker : MonoBehaviour
 	private void MakeDecisionAsDefender() {
 		TryGetBall(true);
 
-		Player _ballCarrier = GameManager.Instance.GetBallCarrier();
-		//Player _teammateNearestBall = Utils.GetPlayerNearestBall(player.GetTeam());
-
 		//Player is closest on team to loose ball or opponent with ball
-		if ((!_ballCarrier || (_ballCarrier && _ballCarrier.GetTeam() != player.GetTeam())) && Utils.GetPlayerNearestBall(player.GetTeam()) == player) {
+		if ((IsBallLoose() && IsClosestOnTeamToBall()) || OpponentHasBall()) {
 			MoveToBall();
 			return;
 		}
@@ -107,23 +122,23 @@ public class AIADecisionMaker : MonoBehaviour
 		//When ball is loose in own zone
 		bool _IsBallInOwnZone = Utils.IsV2LocationInZone(GameManager.Instance.GetBallLocation(), player.GetTeam());
 		//Debug.Log($"Is ball in own zone for {gameObject.name}? {_IsBallInOwnZone}");
-		if (!_ballCarrier && _IsBallInOwnZone) {
+		if (!ballCarrier && _IsBallInOwnZone) {
 			MoveToBall();
 			return;
-		} else if(!_ballCarrier && !_IsBallInOwnZone) {
+		} else if(!ballCarrier && !_IsBallInOwnZone) {
 			MoveToFormation();
 			return;
 		}
 
 		//Has ball
-		if (_ballCarrier == player) {
+		if (ThisPlayerHasBall()) {
 			player.SetAbility(true); //Charge shot
-			AvoidOpponent();
+			MoveForwardAvoidingOpponents();
 			return;
 		}
 
 		//Team has ball
-		if (_ballCarrier && _ballCarrier.GetTeam() == player.GetTeam() && _ballCarrier != player) {
+		if (TeammateHasBall()) {
 			aiaStar.SetTarget(Utils.GetDefendingZoneBasedLocation(new Vector2(.1f, 0f), player.GetTeam()));
 			return;
 		}
@@ -133,17 +148,23 @@ public class AIADecisionMaker : MonoBehaviour
 
 	#region Playmaker
 	private void MakeDecisionAsPlaymaker() {
-		Player _ballCarrier = GameManager.Instance.GetBallCarrier();
 
-		//If Player Nearest The Ball
-		if (_ballCarrier != player && Utils.GetPlayerNearestBall(player.GetTeam()) == player) {
+		TryGetBall(true);
+
+		//Player is closest on team to loose ball or opponent with ball
+		if (!TeamHasBall() && IsClosestOnTeamToBall()) {
 			MoveToBall();
+			return;
 		}
 
-		//If player Has ball
-		if (_ballCarrier == player) {
-			player.SetAbility(true); //charge shot
-			//AvoidAll();
+		if (ThisPlayerHasBall()) {
+			TryAttemptPass();
+			return;
+		}
+
+		if (TeammateHasBall() || !TeamHasBall()) {
+			GoToPassingLocation();
+			return;
 		}
 
 		TryGetBall();
@@ -151,14 +172,13 @@ public class AIADecisionMaker : MonoBehaviour
 	#endregion
 	private void ClearTheBall() {
 		string[] _tag = new string[] { Utils.GetOpposingPlayerTag(player), "stadium" };
-		List<int> _list = Utils.GetForwardDirsPerTeam(player.GetTeam());
 
 		int _dirToMove = Utils.GetDirWithoutTags(player, localPerception, _tag, DirectionType.ForwardPreferredNeutral);
 		if (_dirToMove == -1) {
 			return;
 		}
 
-		AttemptKick(_dirToMove);
+		AttemptKick(_dirToMove, GameManager.Instance.maxChargeTime * .5f);
 	}
 
 	private void TryGetBall(bool _staminaCheck = false) {
@@ -173,8 +193,21 @@ public class AIADecisionMaker : MonoBehaviour
 				}
 				player.SetAbility(true);
 				player.SetMovement(Utils.IntDirToInput(Utils.GetForwardDirPerTeam(player.GetTeam()))); //Do this so that ball doesn't end up in own net
-				//player.SetAbility(false);
 			}
+		}
+	}
+
+	private void GoToPassingLocation() {
+		Vector2 _arenaLeftMostFormation = new Vector2(-1.5f, player.GetFormationLocation().y);
+		Vector2 _arenaDir = Vector2.right;
+		Vector2 _carrierLocation = ballCarrier ? ballCarrier.transform.position : GameManager.Instance.GetBallLocation();
+		Vector2 _forwardDirFromBall = Utils.IntDirToInput(Utils.GetForwardAngleFromBall(player, player.GetFormationLocation().y));
+		Vector2? target = Utils.Intersection(_arenaLeftMostFormation, _arenaDir, _carrierLocation, _forwardDirFromBall);
+		if (target.HasValue) {
+			//Debug.Log($"Going to passing location {target.Value}");
+			Vector2 _clampedPos = Utils.ClampedArenaPos(target.Value, .4f);
+			DebugExtension.DebugPoint(_clampedPos, .5f, .1f);
+			aiaStar.SetTarget(_clampedPos);
 		}
 	}
 
@@ -195,8 +228,8 @@ public class AIADecisionMaker : MonoBehaviour
 		aiaStar.SetTarget(GameManager.Instance.GetBallLocation());
 	}
 
-	private void AvoidOpponent() {
-		Debug.Log($"{gameObject.name} avoiding opponents");
+	private void MoveForwardAvoidingOpponents() {
+		//Debug.Log($"{gameObject.name} avoiding opponents");
 		aiaStar.CancelCurrentPath();
 		Vector2 _currentMoveInput = player.GetCurrentMoveInput();
 		//Debug.Log($"Avoiding opponent have movement {_currentMoveInput}");
@@ -223,35 +256,117 @@ public class AIADecisionMaker : MonoBehaviour
 				player.SetMovement(_currentMoveInput);
 				return;
 			} else {
-				TryAttemptPass();
+				TryAttemptKick();
 			}
 
 		} else {
-			TryAttemptPass();
+			TryAttemptKick();
 		}
 
 
 	
 	}
 
-	private void TryAttemptPass() {
+	private void TryAttemptKick() {
 		int _newDir = Utils.GetDirWithoutTags(player, localPerception, new string[] { "stadium", Utils.GetOpposingPlayerTag(player) }, DirectionType.ForwardPreferred);
 		if (_newDir == -1) _newDir = Utils.GetForwardDirPerTeam(player.GetTeam());
-		AttemptKick(_newDir);
+		AttemptKick(_newDir, GameManager.Instance.maxChargeTime * .5f);
 	}
 
-	private void AttemptKick(int _dir) {
-		Debug.Log("Attempting Kick");
-		float _minShootChargeStrength = GameManager.Instance.maxChargeTime / 2f;
-		if (player.GetShotCharge() >= _minShootChargeStrength) {
+	private void TryAttemptShot() {
+		//Check if the player has a clear shot on goal;
+		int _newDir = Utils.GetDirWithTags(player, localPerception, new string[] { Utils.GetOpponentGoalTag(player) }, DirectionType.All);
+
+		//If there is no clear shot on goal, move in a new dir.
+		if (_newDir == -1) {
+			string[] _tag = new string[] { Utils.GetOpposingPlayerTag(player), "stadium" };
+
+			int _dirToMove = Utils.GetDirWithoutTags(player, localPerception, _tag, DirectionType.ForwardPreferredNeutral);
+			player.SetMovement(Utils.IntDirToInput(_dirToMove));
+			return;
+		}
+
+		AttemptKick(_newDir, GameManager.Instance.maxChargeTime * .5f);
+	}
+
+	private void TryAttemptPass() {
+		//Check if the player has a clear shot on goal;
+		DirectionType _dirType = IsBallInAttackingZone() ? DirectionType.All : DirectionType.ForwardPreferredNeutral;
+		int _newDir = Utils.GetDirWithTags(player, localPerception, new string[] { Utils.GetTeamPlayerTag(player) }, _dirType);
+
+		//If there is no clear pass, try to take a shot
+		if (_newDir == -1) {
+			TryAttemptShot();
+		}
+
+		AttemptKick(_newDir, GameManager.Instance.maxChargeTime * .5f);
+	}
+
+	private void AttemptKick(int _dir, float _minCharge) {
+		//Debug.Log("Attempting Kick");
+		if (player.GetShotCharge() >= _minCharge) {
 			KickInDir(_dir);
 		}
 
 	}
 
+
 	private void KickInDir(int _dir) {
-		Debug.Log($"Attempting to kick in {_dir}");
+		//Debug.Log($"Attempting to kick in {_dir}");
 		player.SetMovement(Utils.IntDirToInput(_dir));
 		player.SetAbility(false);
+	}
+
+	private bool TeammateHasBall() {
+		return TeamHasBall() && !ThisPlayerHasBall();
+	}
+
+	private bool ThisPlayerHasBall() {
+		return ballCarrier == player;
+	}
+
+	private bool AnyPlayerHasBall() {
+		return ballCarrier != null;
+	}
+
+	private bool IsBallLoose() {
+		return ballCarrier == null;
+	}
+
+	private bool TeamHasBall() {
+		return AnyPlayerHasBall() && ballCarrier.GetTeam() == player.GetTeam();
+	}
+
+
+	private bool OpponentHasBall() {
+		return AnyPlayerHasBall() && ballCarrier.GetTeam() != player.GetTeam();
+	}
+
+	private bool IsClosestOnTeamToBall() {
+		return Utils.GetPlayerNearestBall(player.GetTeam()) == player;
+	}
+
+	private bool IsClosestToBall() {
+		return Utils.GetPlayerNearestBall() == player;
+	}
+
+	private bool IsBallHeadedTowardsTeamGoal() {
+		return GameManager.Instance.IsBallHeadedTowardsGoal(player.GetTeam());
+	}
+
+	private bool IsBallInAttackingZone() {
+		if (player.GetTeam() == Team.Home){
+			return GameManager.Instance.GetBallLocation().x > 0;
+		} else {
+			return GameManager.Instance.GetBallLocation().x < 0;
+		}
+	}
+
+	private bool IsBallInDefendingZone() {
+		if (player.GetTeam() == Team.Home) {
+			return GameManager.Instance.GetBallLocation().x < 0;
+		} else {
+			return GameManager.Instance.GetBallLocation().x > 0;
+		}
 	}
 }

@@ -1,7 +1,4 @@
 using UnityEngine;
-using System.Collections;
-// Note this line, if it is left out, the script won't know that the class 'Path' exists and it will throw compiler errors
-// This line should always be present at the top of scripts which use pathfinding
 using Pathfinding;
 
 public class AIAstar : MonoBehaviour {
@@ -18,7 +15,6 @@ public class AIAstar : MonoBehaviour {
     private float nextWaypointDistance = .01f;
 
     public void Start() {
-        // Get a reference to the Seeker component we added earlier
         seeker = GetComponent<Seeker>();
         player = GetComponent<Player>();
     }
@@ -29,14 +25,26 @@ public class AIAstar : MonoBehaviour {
 
     public void SetTarget(Vector2 _targetPosition) {
         if(targetPosition.HasValue && Vector2.Distance(_targetPosition, targetPosition.Value) < .01f) {
+            //Debug.Log($"Exiting Set target because target: {targetPosition.HasValue} && target disance to existing is less than .01");
             return;
 		}
+
+        if(GameManager.Instance.GetIsTransitioning() && _targetPosition != player.GetFormationLocation()) {
+            return;
+		}
+
         targetPosition = _targetPosition;
+        //Debug.Log($"Target position for {gameObject.name} on {player.GetTeam()} set to {targetPosition}");
         GoToTargetPosition();
     }
 
+
+	public void Reset() {
+        targetPosition = null;
+    }
+
 	private void Update() {
-		if (targetPosition == null) {
+		if (targetPosition == null || !GameManager.Instance.GetCanMove()) {
             return;
 		}
         ProcessPath();
@@ -54,7 +62,6 @@ public class AIAstar : MonoBehaviour {
     }
 
     public void Repath() {
-        Debug.Log("Repath");
         GoToTargetPosition();
     }
 
@@ -102,20 +109,6 @@ public class AIAstar : MonoBehaviour {
 
     private void GoToTargetPosition() {
         if(seeker != null && path != null) seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
-    }
-
-    public void SprintUntilTargetReached(Vector2 _target) {
-        StopAllCoroutines();
-        StartCoroutine(SprintUntilTarget(_target));
-    }
-
-    IEnumerator SprintUntilTarget(Vector2 _target) {
-        SetTarget(_target);
-        while (!reachedEndOfPath) {
-            player.SetSprint(true);
-            yield return null;
-        }
-        player.SetSprint(false);
     }
 
     public void OnPathComplete(Path p) {

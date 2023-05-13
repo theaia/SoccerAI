@@ -51,7 +51,7 @@ public class AnimController : MonoBehaviour
         if (currentFrame >= GameManager.Instance.animFrameRate && activeAnim != null) {
             currentAnimFrame = currentAnimFrame == activeAnim.Count - 1 ? 0 : currentAnimFrame + 1;
             spriteRenderer.sprite = activeAnim[currentAnimFrame];
-            currentFrame = 0;
+            currentFrame -= GameManager.Instance.animFrameRate;
         }
     }
 

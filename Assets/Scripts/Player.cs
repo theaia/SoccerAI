@@ -10,7 +10,11 @@ public enum PlayStyle {
 
 public class Player : MonoBehaviour
 {
-    private InputData inputData;
+    private InputData inputData = new InputData() {
+        Move = Vector2.zero,
+        Sprint = false,
+        Ability = false
+    };
     private KeyboardInput[] m_Inputs;
     private AnimController animController;
 
@@ -23,6 +27,7 @@ public class Player : MonoBehaviour
     private string lastCollidedObjectTagged;
     private Vector2 formationLocation;
 
+
     [SerializeField] private Team team;
     [SerializeField] private PlayStyle role;
 
@@ -31,11 +36,13 @@ public class Player : MonoBehaviour
     private LocalPerception localPerception;
 
     private bool canShoot = true;
+    private bool isCheering = false;
 
     [HideInInspector] public GameObject targetBallPosition;
     [SerializeField] private GameObject[] targetBallPositions;
     [SerializeField] private SpriteRenderer chargeSprite, staminaSprite;
     [HideInInspector] public bool m_CanControl;
+    [HideInInspector] public bool IsTransitioning;
 
     public PlayerAgent GetAgent() {
         return agent;
@@ -53,13 +60,25 @@ public class Player : MonoBehaviour
         return isBallNearby;
     }
 
+    public void SetIsCheering(bool _value) {
+        isCheering = _value;
+	}
+
     public void Reset() {
+        rb.velocity = Vector2.zero;
+        inputData = new InputData() {
+            Move = Vector2.zero,
+            Sprint = false,
+            Ability = false
+		};
+        aiaStar.Reset();
         canShoot = true;
         stamina = GameManager.Instance.maxStamina;
         shotChargeTime = 0f;
         speed = GameManager.Instance.standardSpeed;
         isBallNearby = false;
-        hasBall = false;
+        isCheering = false;
+        SetHasBall(false);
     }
 
     public void SetAnimController(AnimController _animController) {
@@ -204,11 +223,15 @@ public class Player : MonoBehaviour
     }
 
     public void ProcessInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
-        Animate(GameManager.Instance.GetGameState() == GameState.Goal && GameManager.Instance.GetLastScoringTeam() == team);
+        Animate(isCheering);
 
-		if (!GameManager.Instance.GetCanMove()) {
+        CheckOutOfBounds();
+
+        if (!GameManager.Instance.GetCanMove()) {
+            //Debug.Log("Can't process input.  Player can't move");
             return;
 		}
+
         //Debug.Log($"{gameObject.name} current move input: {_moveDir}");
         rb.velocity = _moveDir.normalized * speed * Time.fixedDeltaTime;
 
@@ -377,9 +400,10 @@ public class Player : MonoBehaviour
             return;
 		}
 
-		if (!GameManager.Instance.GetCanMove()) {
+        if (!GameManager.Instance.GetCanMove()) {
+            animController.SetAnimState(State.idle);
             return;
-		}
+        }
 
         if (inputData.Move.x == 0 && inputData.Move.y > 0) {
             animController.SetAnimState(State.up);
@@ -445,5 +469,14 @@ public class Player : MonoBehaviour
 
     public string GetLastCollidedObject() {
         return lastCollidedObjectTagged;
+    }
+
+    private void CheckOutOfBounds() {
+        if(transform.position.x < GameManager.Instance.ArenaWidth.x ||
+            transform.position.x > GameManager.Instance.ArenaWidth.y ||
+            transform.position.y < GameManager.Instance.ArenaHeight.x ||
+            transform.position.y > GameManager.Instance.ArenaHeight.y) {
+            transform.position = formationLocation;
+		}
     }
 }

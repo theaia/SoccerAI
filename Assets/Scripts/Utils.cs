@@ -25,7 +25,7 @@ public static class Utils{
     }
 
     public static int InputToDir(Vector2 _input) {
-        Debug.Log("Input to dir " + _input);
+        //Debug.Log("Input to dir " + _input);
         if (_input == Vector2.up) {
             return 0;
         } else if (_input == new Vector2(0.707f, 0.707f) || _input == new Vector2(1f, 1f)) {
@@ -181,19 +181,19 @@ public static class Utils{
                 _matchingTag[w] = _perception[_dirs[i]] == _tags[w];
                 //_newList.Add(_matchingTag[w] ? 1 : 0);
                 if (_matchingTag[w]) {
-                    Debug.Log($"{_matchingTag[w]} found on loop {_tags[w]} in dir {_dirs[i]}. Returning value");
+                    //Debug.Log($"{_matchingTag[w]} found on loop {_tags[w]} in dir {_dirs[i]}. Returning value");
                     return _dirs[i];
                 }
             }
         }
 
-        Debug.Log($"Tags found in any direction");
+        //Debug.Log($"No tags found in any direction");
         return -1; //Default return value if none found
     }
 
     public static bool CheckDirClearOfTags(string[] _perception, string[] _tags, int _dir) {
         if(_dir < 0 || _dir > 8) {
-            Debug.Log($"Invalid dir input {_dir}.  Returning true");
+            //Debug.Log($"Invalid dir input {_dir}.  Returning true");
             return true;
         }
         //Debug.Log($"dir {_dir}. tag length {_tags.Length}. perception length {_perception.Length}");
@@ -202,7 +202,7 @@ public static class Utils{
         for (int w = 0; w < _tags.Length; w++) { //Check against every tag
             _matchingTag[w] = _perception[_dir] == _tags[w];
             if (_matchingTag[w]) { 
-                Debug.Log(_tags[w] + " is making the current dir not clear");
+                //Debug.Log(_tags[w] + " is making the current dir not clear");
                 return false;
             }
         }
@@ -213,7 +213,7 @@ public static class Utils{
                 return false;
             }
         }*/
-        Debug.Log("Is free of objects to avoid");
+        //Debug.Log("Is free of objects to avoid");
         return true;
     }
 
@@ -278,16 +278,6 @@ public static class Utils{
 
     public static Player GetPlayerNearestBall(Team? _team = null) {
         Player _currentClosestPlayerToBall = GameManager.Instance.GetCachedPlayerNearestBall(_team);
-
-        /*if (_currentClosestPlayerToBall != null) {
-            if(_team != null) {
-                Debug.Log($"{_currentClosestPlayerToBall.name} is closest to ball on {_team.Value}");
-            } else {
-                Debug.Log($"{_currentClosestPlayerToBall.name} is closest to ball");
-            }
-        } else {
-            Debug.Log("No closest player found");
-        }*/
         return _currentClosestPlayerToBall;
     }
 
@@ -382,6 +372,61 @@ public static class Utils{
             DebugExtension.DebugPoint(_origin, Color.red, .1f, .1f);
         }
     }
+
+    public static Vector2? Intersection(Vector2 pointA1, Vector2 dirA, Vector2 pointB1, Vector2 dirB) {
+        // Line A represented as a1x + b1y = c1
+        Debug.DrawRay(pointA1, dirA, Color.white, 1f);
+        Debug.DrawRay(pointB1, dirB, Color.black, 1f);
+        float a1 = dirA.y;
+        float b1 = -dirA.x;
+        float c1 = a1 * pointA1.x + b1 * pointA1.y;
+
+        // Line B represented as a2x + b2y = c2
+        float a2 = dirB.y;
+        float b2 = -dirB.x;
+        float c2 = a2 * pointB1.x + b2 * pointB1.y;
+
+        float determinant = a1 * b2 - a2 * b1;
+
+        // If the lines are parallel (det = 0), return null
+        if (Mathf.Abs(determinant) < Mathf.Epsilon) // Using Epsilon for a tiny float number
+        {
+            return null;
+        } else {
+            // Otherwise, compute the intersection point
+            float x = (b2 * c1 - b1 * c2) / determinant;
+            float y = (a1 * c2 - a2 * c1) / determinant;
+            return new Vector2(x, y);
+        }
+    }
+
+
+    public static int GetForwardAngleFromBall(Player _player, float? _formationLine = null) {
+        if(_player.GetTeam() == Team.Home) {
+			if (_formationLine.HasValue) {
+                return GameManager.Instance.GetBallLocation().y < _formationLine.Value ? 1 : 3;
+			} else {
+                return GameManager.Instance.GetBallLocation().y < 0 ? 1 : 3;
+            }
+		} else {
+            if (_formationLine.HasValue) {
+                return GameManager.Instance.GetBallLocation().y < _formationLine.Value ? 7 : 5;
+            } else {
+                return GameManager.Instance.GetBallLocation().y < 0 ? 7 : 5;
+            }
+        }
+
+	}
+
+    public static bool RandomBool() {
+        return Random.value > 0.5f;
+    }
+
+    public static Vector2 ClampedArenaPos(Vector2 _value, float _sideMargins = 0, float _topMargins = 0) {
+        float _newX = Mathf.Clamp(_value.x, GameManager.Instance.ArenaWidth.x + _sideMargins, GameManager.Instance.ArenaWidth.y - _sideMargins);
+        float _newY = Mathf.Clamp(_value.y, GameManager.Instance.ArenaHeight.x + _topMargins, GameManager.Instance.ArenaHeight.y - _topMargins);
+        return new Vector2(_newX, _newY);
+	}
 }
 
 public enum DirectionType {

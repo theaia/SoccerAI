@@ -17,7 +17,7 @@ public class Ball : MonoBehaviour
 	[SerializeField] Cursor cursor;
 	private int currentFrame;
 	private int currentAnimFrame;
-	private SpriteRenderer renderer;
+	private SpriteRenderer rend;
 	private Player ballCarrier;
 	private Player lastHomeTouch;
 	private Player lastAwayTouch;
@@ -26,38 +26,50 @@ public class Ball : MonoBehaviour
 	private Vector2? shotVector;
 	bool canPickup;
 
-	private float timeout = 25f;
-	private float timer;
+	private float timeout = 10f;
+	private float timeoutTimer;
 
 	private void Awake() {
 		rb = GetComponent<Rigidbody2D>();
 		col = GetComponent<Collider2D>();
-		renderer = GetComponent<SpriteRenderer>();
+		rend = GetComponent<SpriteRenderer>();
 	}
 
 	public void Start() {
-		Reset();
+		Reset(true);
 	}
 
-	public void Reset() {
+	public void Reset(bool _enablePhysics) {
 		SetBallCarrier(null);
-		timer = 0;
+		timeoutTimer = 0;
 		col.enabled = false;
 		transform.position = new Vector2(.004f, 0f);
 		rb.velocity = Vector2.zero;
-		col.enabled = true;
-		rb.isKinematic = false;
+		rb.isKinematic = !_enablePhysics;
 		lastAwayTouch = null;
 		lastHomeTouch = null;
 		lastShot = null;
 		lastTouch = null;
 		shotVector = null;
 		canPickup = true;
+		col.enabled = _enablePhysics;
+		foreach(Player _player in GameManager.Instance.GetPlayers()) {
+			_player.Reset();
+		}
 	}
+
 	public void SetBallCarrier(Player _value) {
-		if (!GameManager.Instance.GetCanMove()) {
+		GameState _gameState = GameManager.Instance.GetGameState();
+		if (!(_gameState == GameState.Playing || _gameState == GameState.Training || _gameState == GameState.Overtime || _gameState == GameState.Kickoff)) {
+			Debug.Log($"Trying to set ball holder to {_value} during non-playing state");
 			return;
 		}
+
+		if (_value != null && (_gameState == GameState.Kickoff || _gameState == GameState.Overtime)) {
+			Debug.Log($"Trying to set ball holder to {_value.name} during a transition state");
+			return;
+		}
+
 		//Register Pass & Giveaway
 		if (/*shotVector != null &&*/ _value && lastShot) {
 			if (lastShot.GetTeam() == _value.GetTeam() && lastShot != _value) {
@@ -89,7 +101,7 @@ public class Ball : MonoBehaviour
 		if (ballCarrier) {
 			lastTouch = ballCarrier;
 			shotVector = null;
-			timer = 0;
+			timeoutTimer = 0;
 			SetLastTouch(ballCarrier);
 			ballCarrier.SetHasBall(true);
 			rb.isKinematic = true;
@@ -107,11 +119,13 @@ public class Ball : MonoBehaviour
 	}
 
 	private void Update() {
-		if (GameManager.Instance.GetGameState() == GameState.Training && !ballCarrier) {
-			timer += Time.deltaTime;
-			if(timer > timeout) {
-				Reset();
+		if(rb.velocity.magnitude < 1f) {
+			timeoutTimer += Time.deltaTime;
+			if (timeoutTimer > timeout) {
+				GameManager.Instance.SetGameState(GameState.Whistle);
 			}
+		} else {
+			timeoutTimer = 0f;
 		}
 
 		if (rb.velocity.magnitude < .01f && !ballCarrier) {
@@ -125,7 +139,7 @@ public class Ball : MonoBehaviour
 		float _framerate = Mathf.Lerp(MinBallSpeedFrameRate, MaxBallSpeedFrameRate, _cappedSpeed / BallSpeedAtMaxFrameRate);
 		if (currentFrame >= _framerate) {
 			currentAnimFrame = currentAnimFrame == activeAnim.Length - 1 ? 0 : currentAnimFrame + 1;
-			renderer.sprite = activeAnim[currentAnimFrame];
+			rend.sprite = activeAnim[currentAnimFrame];
 			currentFrame = 0;
 		}
 	}
