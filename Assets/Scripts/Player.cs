@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private bool hasBall;
     private float stamina;
-    private float speed = 1f;
+    [SerializeField] private float speed = 1f;
     private float shotChargeTime;
     private bool isBallNearby;
     private string lastCollidedObjectTagged;
@@ -220,9 +220,9 @@ public class Player : MonoBehaviour
             //Debug.Log("Can't process input.  Player can't move");
             return;
 		}
-        _moveDir = Utils.DirToClosestInput(_moveDir);
+        _moveDir = Utils.DirToClosestInput(_moveDir).normalized;
         //Debug.Log($"{gameObject.name} current move input: {_moveDir}");
-        Vector3 _velocity = _moveDir * speed * Time.fixedDeltaTime;
+        Vector3 _velocity = _moveDir * speed * Time.deltaTime;
         rb.velocity = _velocity;
         //Debug.Log($"{gameObject.name} current move input: {_moveDir}.  Calc'd velocity: {_velocity}");
 
@@ -255,6 +255,7 @@ public class Player : MonoBehaviour
         }
         if (_sprint && stamina > GameManager.Instance.staminaConsumeRate) {
             if (speed == GameManager.Instance.standardSpeed) {
+                StopCoroutine(FadeToSprintSpeed(GameManager.Instance.speedLerp));
                 StartCoroutine(FadeToSprintSpeed(GameManager.Instance.speedLerp));
             };
             ConsumeStamina(GameManager.Instance.staminaConsumeRate);

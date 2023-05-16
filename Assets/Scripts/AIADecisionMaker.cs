@@ -190,7 +190,7 @@ public class AIADecisionMaker : MonoBehaviour
 		if (target.HasValue) {
 			//Debug.Log($"Going to passing location {target.Value}");
 			Vector2 _clampedPos = Utils.ClampedArenaPos(target.Value, .4f);
-			DebugExtension.DebugPoint(_clampedPos, .5f, .1f);
+			//DebugExtension.DebugPoint(_clampedPos, .5f, .1f);
 			aiaStar.SetTarget(_clampedPos);
 		}
 	}

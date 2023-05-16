@@ -27,11 +27,11 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private TextMeshProUGUI homeScoreText, awayScoreText, timerText;
 	public LayerMask DirectionLayersToCheck;
 
-	public float standardSpeed { get; private set; } = 15f;
-	public float sprintSpeed { get; private set; } = 20f;
-	public float returnToFormationSpeed { get; private set; } = 35f;
+	public float standardSpeed { get; private set; } = 20f;
+	public float sprintSpeed { get; private set; } = 27f;
+	public float returnToFormationSpeed { get; private set; } = 50f;
 	public float maxStamina { get; private set; } = 100f;
-	public float staminaRechargeRate { get; private set; } = .05f;
+	public float staminaRechargeRate { get; private set; } = .1f;
 	public float staminaConsumeRate { get; private set; } = .1f;
 	public float staminaRechargeDelay { get; private set; } = 2f;
 	public float staminaDisplayTime { get; private set; } = 2f;
@@ -478,6 +478,7 @@ public class GameManager : MonoBehaviour {
 		Debug.Log($"Changing game state to {currentGameState}");
 		switch (currentGameState) {
 			case GameState.Goal:
+				ball.Reset(false);
 				StartCoroutine(GoalCelebration());
 				break;
 			case GameState.Kickoff:
@@ -488,6 +489,7 @@ public class GameManager : MonoBehaviour {
 				canMove = true;
 				break;
 			case GameState.Whistle:
+				ball.Reset(false);
 				StartCoroutine(Whistle());
 				break;
 			case GameState.Overtime:
@@ -538,7 +540,6 @@ public class GameManager : MonoBehaviour {
 	}
 
 	IEnumerator GoalCelebration() {
-		ball.Reset(false);
 		List<Player> _scoringTeamPlayers = lastScoringTeam == Team.Home ? homePlayers : awayPlayers;
 		canMove = false;
 		foreach (Player _player in allPlayers) {
@@ -547,9 +548,7 @@ public class GameManager : MonoBehaviour {
 		foreach (Player _player in _scoringTeamPlayers) {
 			_player.SetIsCheering(true);
 		}
-		ball.Reset(false);
 		yield return new WaitForSeconds(3f);
-		ball.Reset(false);
 		foreach (Player _player in _scoringTeamPlayers) {
 			_player.SetIsCheering(false);
 		}
@@ -558,7 +557,6 @@ public class GameManager : MonoBehaviour {
 		float _savedSpeed = standardSpeed;
 		standardSpeed = returnToFormationSpeed;
 		yield return new WaitUntil(() => !GetIsTransitioning());
-		ball.Reset(false);
 		StartCoroutine(SetGameStateAfterDelay(GameState.Kickoff, .1f));
 		standardSpeed = _savedSpeed;
 	}

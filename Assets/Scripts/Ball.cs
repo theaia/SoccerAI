@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
@@ -14,7 +12,6 @@ public class Ball : MonoBehaviour
 	[SerializeField] int BallSpeedAtMaxFrameRate = 1;
 	[SerializeField] float ballCarryingLerpSpeed = 1;
 	[SerializeField] float maxDifferentalForShot = .1f;
-	[SerializeField] Cursor cursor;
 	private int currentFrame;
 	private int currentAnimFrame;
 	private SpriteRenderer rend;
@@ -40,6 +37,7 @@ public class Ball : MonoBehaviour
 	}
 
 	public void Reset(bool _enablePhysics) {
+		//Debug.Log("Resetting ball");
 		SetBallCarrier(null);
 		timeoutTimer = 0;
 		col.enabled = false;
@@ -53,19 +51,19 @@ public class Ball : MonoBehaviour
 		shotVector = null;
 		canPickup = true;
 		col.enabled = _enablePhysics;
-		foreach(Player _player in GameManager.Instance.GetPlayers()) {
+		/*foreach(Player _player in GameManager.Instance.GetPlayers()) {
 			_player.Reset();
-		}
+		}*/
 	}
 
 	public void SetBallCarrier(Player _value) {
 		GameState _gameState = GameManager.Instance.GetGameState();
-		if (!(_gameState == GameState.Playing || _gameState == GameState.Training || _gameState == GameState.Overtime || _gameState == GameState.Kickoff)) {
+		if (!(_gameState == GameState.Playing || _gameState == GameState.Training || _gameState == GameState.Overtime || _gameState == GameState.Kickoff || _gameState == GameState.Goal)) {
 			//Debug.Log($"Trying to set ball holder to {_value} during non-playing state");
 			return;
 		}
 
-		if (_value != null && (_gameState == GameState.Kickoff || _gameState == GameState.Overtime)) {
+		if (_value != null && (_gameState == GameState.Kickoff || _gameState == GameState.Overtime || _gameState == GameState.Goal)) {
 			//Debug.Log($"Trying to set ball holder to {_value.name} during a transition state");
 			return;
 		}
@@ -107,14 +105,12 @@ public class Ball : MonoBehaviour
 			rb.isKinematic = true;
 			rb.velocity = Vector2.zero;
 			rb.angularVelocity = 0;
-			cursor.gameObject.SetActive(true);
 			if (GameManager.Instance.GetGameState() == GameState.Kickoff) {
 				GameManager.Instance.SetGameState(GameState.Playing);
 			}
 
 		} else {
 			rb.isKinematic = false;
-			cursor.gameObject.SetActive(false);
 		}
 	}
 
