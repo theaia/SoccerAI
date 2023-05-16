@@ -38,10 +38,12 @@ public class PlayerAgent : Agent {
     #endregion
 
     Player m_PlayerController;
+    [HideInInspector] public DecisionRequester m_DecisionRequester;
 
     void Awake() {
         m_PlayerController = GetComponent<Player>();
         behaviorParameters = GetComponent<BehaviorParameters>();
+        m_DecisionRequester = GetComponent<DecisionRequester>();
     }
 
 	private void Update() {
@@ -53,23 +55,25 @@ public class PlayerAgent : Agent {
     }
 
 	public override void OnEpisodeBegin() {
-        transform.position = new Vector3(Random.Range(-1.4f, 1.4f), Random.Range(-1.05f, 1.05f), 0f);
+        transform.position = m_PlayerController.GetFormationLocation();
         timer = 0;
 	}
 
 
     public override void CollectObservations(VectorSensor sensor) {
-        sensor.AddObservation(m_PlayerController.GetCurrentStamina());
-        sensor.AddObservation(m_PlayerController.GetShotCharge());
-        sensor.AddObservation(m_PlayerController.GetVelocityMagnitude());
-        sensor.AddObservation(GameManager.Instance.GetBallLocation());
         sensor.AddObservation(new Vector2(transform.position.x, transform.position.y));
-        sensor.AddObservation(ConvertPlayerTeamToInt(GameManager.Instance.GetBallCarrier()));
-        sensor.AddObservation(ConvertPlayerTeamToInt(m_PlayerController));
-        sensor.AddObservation(GetGoalLocation(m_PlayerController.GetTeam() == Team.Home ? Team.Away : Team.Home)); //Opponent Goal Location
-        sensor.AddObservation(m_PlayerController.GetCanShoot());
+        sensor.AddObservation(GameManager.Instance.GetBallLocation());
 
         sensor.AddObservation(GameManager.Instance.GetBallCarrier() == m_PlayerController);
+        sensor.AddObservation(ConvertPlayerTeamToInt(m_PlayerController));
+        sensor.AddObservation(ConvertPlayerTeamToInt(GameManager.Instance.GetBallCarrier()));
+
+        sensor.AddObservation(GameManager.Instance.GetBallCarrier() ? GameManager.Instance.GetBallCarrier().GetCurrentStamina() : -1f);
+        sensor.AddObservation(m_PlayerController.GetCurrentStamina());
+        sensor.AddObservation(m_PlayerController.GetShotCharge());
+        //sensor.AddObservation(m_PlayerController.GetVelocityMagnitude());
+
+
     }
 
     private int ConvertPlayerTeamToInt(Player _ballCarrier) {
@@ -80,14 +84,6 @@ public class PlayerAgent : Agent {
         }
 
         return _teamInt;
-    }
-
-    private Vector2 GetGoalLocation(Team team) {
-        if (team == Team.Home) {
-            return new Vector2(-1.465f, 0);
-        } else {
-            return new Vector2(1.465f, 0);
-        }
     }
 
     private void ProcessRewards() {
@@ -114,12 +110,12 @@ public class PlayerAgent : Agent {
 
     public void PasserReward() {
         Debug.Log($"{gameObject.name} completed a successful pass");
-        AddReward(PassReward);
+        //AddReward(PassReward);
     }
 
     public void TacklerReward() {
         Debug.Log($"{gameObject.name} successfully tackled");
-        AddReward(TackleReward);
+        //AddReward(TackleReward);
     }
 
     public void ShooterReward(float _shotForce) {
@@ -127,7 +123,7 @@ public class PlayerAgent : Agent {
             return;
         }
         Debug.Log($"{gameObject.name} attempted a shot or pass of {_shotForce} speed");
-        AddReward(ShootReward * _shotForce);
+        //AddReward(ShootReward * _shotForce);
     }
 
     public void ShooterOnNetReward() {
@@ -135,13 +131,13 @@ public class PlayerAgent : Agent {
     }
 
     public void TackleePenalty() {
-        Debug.Log($"{gameObject.name} was tackled");
-        AddReward(TackledPenalty);
+        //Debug.Log($"{gameObject.name} was tackled");
+        //AddReward(TackledPenalty);
     }
 
     public void FriendlyTacklerPenalty() {
-        Debug.Log($"{gameObject.name} stole the ball from their own teammate. Oof.");
-        AddReward(FriendlyTacklePenalty);
+        //Debug.Log($"{gameObject.name} stole the ball from their own teammate. Oof.");
+        //AddReward(FriendlyTacklePenalty);
     }
 
     public void ClumpPenalty() {
@@ -149,12 +145,14 @@ public class PlayerAgent : Agent {
     }
 
     public void GiveawayerPenalty() {
-        Debug.Log($"{gameObject.name} gave away the ball");
-        AddReward(GiveawayPenalty);
+        //Debug.Log($"{gameObject.name} gave away the ball");
+        //AddReward(GiveawayPenalty);
     }
 
     public override void OnActionReceived(ActionBuffers actions) {
-
+        if (GameManager.Instance.GetIsTransitioning()) {
+            return;
+        }
         int _horMoveDir = actions.DiscreteActions[0]; // 0 = none // 1 = right // 2 = left
         int _vertMoveDir = actions.DiscreteActions[1]; // 0 = none // 1 = up // 2 = down
         int _ability = actions.DiscreteActions[2]; // 0 = off // 1 = on
@@ -169,35 +167,18 @@ public class PlayerAgent : Agent {
         if (_vertMoveDir == 2) {
             _vertMoveDir = -1;
         }
-        m_PlayerController.ProcessInputs(new Vector2(_horMoveDir, _vertMoveDir), _ability == 1 ? true : false, _sprint == 1 ? true : false);
+
+        m_PlayerController.SetMovement(new Vector2(_horMoveDir, _vertMoveDir));
+        m_PlayerController.SetAbility(_ability == 1 ? true : false);
+        m_PlayerController.SetSprint(_sprint == 1 ? true : false);
         ProcessRewards();
     }
 
-    private Vector2 ConvertActionToVector2(int _value) {
-        switch (_value) {
-            default:
-            case 0:
-                return Vector2.zero;
-            case 1:
-                return Vector2.up;
-            case 2:
-                return new Vector2(0.707f, 0.707f);
-            case 3:
-                return Vector2.right;
-            case 4:
-                return new Vector2(0.707f, -0.707f);
-            case 5:
-                return Vector2.down;
-            case 6:
-                return new Vector2(-0.707f, -0.707f);
-            case 7:
-                return Vector2.left;
-            case 8:
-                return new Vector2(-0.707f, 0.707f);
-        }
-	}
-
     public override void Heuristic(in ActionBuffers actionsOut) {
+        if (GameManager.Instance.GetIsTransitioning()) {
+            return;
+        }
+        Debug.Log("Running Heuristic movement");
         ActionSegment<int> discreteActions = actionsOut.DiscreteActions;
 
         int _horMoveDir = (int)Input.GetAxis("Horizontal");

@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class FormationSpot : MonoBehaviour
 {
-    public PlayStyle Role;
+    public Role Role;
 }

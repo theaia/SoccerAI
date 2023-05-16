@@ -1,11 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public enum PlayStyle {
+public enum Role {
     Striker,
     Playmaker,
     Defender,
-    Goalie
+    Goalie,
+    Human
 }
 
 public class Player : MonoBehaviour
@@ -29,7 +30,7 @@ public class Player : MonoBehaviour
 
 
     [SerializeField] private Team team;
-    [SerializeField] private PlayStyle role;
+    [SerializeField] private Role role;
 
     private PlayerAgent agent;
     private AIAstar aiaStar;
@@ -38,8 +39,7 @@ public class Player : MonoBehaviour
     private bool canShoot = true;
     private bool isCheering = false;
 
-    [HideInInspector] public GameObject targetBallPosition;
-    [SerializeField] private GameObject[] targetBallPositions;
+    [HideInInspector] public Vector2 targetBallPosition;
     [SerializeField] private SpriteRenderer chargeSprite, staminaSprite;
     [HideInInspector] public bool m_CanControl;
     [HideInInspector] public bool IsTransitioning;
@@ -91,11 +91,12 @@ public class Player : MonoBehaviour
 
 	private void Awake() {
         SetTeam(team);
-        m_Inputs = GetComponents<KeyboardInput>();
+        //m_Inputs = GetComponents<KeyboardInput>();
         rb = GetComponent<Rigidbody2D>();
         agent = GetComponent<PlayerAgent>();
         aiaStar = GetComponent<AIAstar>();
         localPerception = GetComponentInChildren<LocalPerception>();
+        m_Inputs = GetComponents<KeyboardInput>();
 
         gameObject.name = GameManager.Instance.GetRandomName();
         stamina = GameManager.Instance.maxStamina;
@@ -150,7 +151,7 @@ public class Player : MonoBehaviour
         inputData.Sprint = _sprint;
     }
 
-    public void SetRole(PlayStyle _role) {
+    public void SetRole(Role _role) {
         role = _role;
     }
 
@@ -167,7 +168,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public PlayStyle GetRole() {
+    public Role GetRole() {
         return role;
 	}
 
@@ -197,24 +198,11 @@ public class Player : MonoBehaviour
         return team;
 	}
 
-    void FixedUpdate()
-    {
-        //Only do this if there are human inputs
-		if (m_Inputs == null) {
-            return;
-		}
-        for (int i = 0; i < m_Inputs.Length; i++) {
-            inputData = m_Inputs[i].GenerateInput();
-        }
-
-        ProcessInputs(inputData.Move, inputData.Ability, inputData.Sprint);
-    }
-
     public Vector2 GetCurrentMoveInput() {
         return inputData.Move;
 	}
 
-    public void GenerareNewInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
+    public void GenerateNewInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
         inputData = new InputData {
             Move = _moveDir,
             Ability = _ability,
@@ -223,6 +211,7 @@ public class Player : MonoBehaviour
     }
 
     public void ProcessInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
+        //Debug.Log("processing inputs");
         Animate(isCheering);
 
         CheckOutOfBounds();
@@ -231,9 +220,11 @@ public class Player : MonoBehaviour
             //Debug.Log("Can't process input.  Player can't move");
             return;
 		}
-
+        _moveDir = Utils.DirToClosestInput(_moveDir);
         //Debug.Log($"{gameObject.name} current move input: {_moveDir}");
-        rb.velocity = _moveDir.normalized * speed * Time.fixedDeltaTime;
+        Vector3 _velocity = _moveDir * speed * Time.fixedDeltaTime;
+        rb.velocity = _velocity;
+        //Debug.Log($"{gameObject.name} current move input: {_moveDir}.  Calc'd velocity: {_velocity}");
 
         if (_ability && canShoot) {
             if (this == GameManager.Instance.GetBallCarrier()) {
@@ -378,7 +369,19 @@ public class Player : MonoBehaviour
         return direction;
 	}
 
-    private void UpdateChargeDisplay() {
+	private void LateUpdate() {
+        if (GameManager.Instance.GetIsTransitioning()) {
+            aiaStar.SetTarget(GetFormationLocation());
+        } else if (GetRole() == Role.Human) {
+            for (int i = 0; i < m_Inputs.Length; i++) {
+                inputData = m_Inputs[i].GenerateInput();
+            }
+        }
+
+        ProcessInputs(inputData.Move, inputData.Ability, inputData.Sprint);
+    }
+
+	private void UpdateChargeDisplay() {
         float _chargePct = Mathf.Clamp01(shotChargeTime / GameManager.Instance.maxChargeTime);
         float _lerp = Mathf.Lerp(0, 1, _chargePct);
 
@@ -408,49 +411,49 @@ public class Player : MonoBehaviour
         if (inputData.Move.x == 0 && inputData.Move.y > 0) {
             animController.SetAnimState(State.up);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[0];
+                targetBallPosition = new Vector2(0f, 0.06f);
             }
 
         } else if(inputData.Move.x > 0 && inputData.Move.y > 0) {
             animController.SetAnimState(State.rightup);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[1];
+                targetBallPosition = new Vector2(0.04f, 0.04f);
             }
 
         } else if (inputData.Move.x > 0 && inputData.Move.y == 0) {
             animController.SetAnimState(State.right);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[2];
+                targetBallPosition = new Vector2(0.06f, 0f);
             }
 
         } else if (inputData.Move.x > 0 && inputData.Move.y < 0) {
             animController.SetAnimState(State.rightdown);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[3];
+                targetBallPosition = new Vector2(0.04f, -0.04f);
             }
 
         } else if (inputData.Move.x == 0 && inputData.Move.y < 0) {
             animController.SetAnimState(State.down);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[4];
+                targetBallPosition = new Vector2(0f, -0.06f);
             }
 
         } else if (inputData.Move.x < 0 && inputData.Move.y < 0) {
             animController.SetAnimState(State.leftdown);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[5];
+                targetBallPosition = new Vector2(-0.04f, -0.04f);
             }
 
         } else if (inputData.Move.x < 0 && inputData.Move.y == 0) {
             animController.SetAnimState(State.left);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[6];
+                targetBallPosition = new Vector2(-0.06f, 0f);
             }
 
         } else if (inputData.Move.x < 0 && inputData.Move.y > 0) {
             animController.SetAnimState(State.leftup);
             if (hasBall) {
-                targetBallPosition = targetBallPositions[7];
+                targetBallPosition = new Vector2(-0.04f, 0.04f);
             }
 
         } else {

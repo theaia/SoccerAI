@@ -26,7 +26,7 @@ public class Ball : MonoBehaviour
 	private Vector2? shotVector;
 	bool canPickup;
 
-	private float timeout = 10f;
+	private float timeout = 25f;
 	private float timeoutTimer;
 
 	private void Awake() {
@@ -61,12 +61,12 @@ public class Ball : MonoBehaviour
 	public void SetBallCarrier(Player _value) {
 		GameState _gameState = GameManager.Instance.GetGameState();
 		if (!(_gameState == GameState.Playing || _gameState == GameState.Training || _gameState == GameState.Overtime || _gameState == GameState.Kickoff)) {
-			Debug.Log($"Trying to set ball holder to {_value} during non-playing state");
+			//Debug.Log($"Trying to set ball holder to {_value} during non-playing state");
 			return;
 		}
 
 		if (_value != null && (_gameState == GameState.Kickoff || _gameState == GameState.Overtime)) {
-			Debug.Log($"Trying to set ball holder to {_value.name} during a transition state");
+			//Debug.Log($"Trying to set ball holder to {_value.name} during a transition state");
 			return;
 		}
 
@@ -119,7 +119,9 @@ public class Ball : MonoBehaviour
 	}
 
 	private void Update() {
-		if(rb.velocity.magnitude < 1f) {
+		CheckOutOfBounds();
+
+		if (rb.velocity.magnitude < 1f /*&& !GameManager.Instance.GetIsTraining()*/) {
 			timeoutTimer += Time.deltaTime;
 			if (timeoutTimer > timeout) {
 				GameManager.Instance.SetGameState(GameState.Whistle);
@@ -166,7 +168,7 @@ public class Ball : MonoBehaviour
 
 	private void FixedUpdate() {
 		if (ballCarrier != null && ballCarrier.targetBallPosition != null) {
-			rb.MovePosition(Vector3.Lerp(transform.position, ballCarrier.targetBallPosition.transform.position, ballCarryingLerpSpeed * Time.fixedDeltaTime));
+			rb.MovePosition(Vector3.Lerp(transform.position, (Vector2)ballCarrier.transform.position + ballCarrier.targetBallPosition, ballCarryingLerpSpeed * Time.fixedDeltaTime));
 		}
 		if(shotVector != null && (/*Vector2.Distance(shotVector.Value, rb.velocity.normalized) > maxDifferentalForShot ||*/ rb.velocity.magnitude < .02f)) {
 			shotVector = null;
@@ -214,6 +216,15 @@ public class Ball : MonoBehaviour
 			lastHomeTouch = ballCarrier;
 		} else {
 			lastAwayTouch = ballCarrier;
+		}
+	}
+
+	private void CheckOutOfBounds() {
+		if (transform.position.x < GameManager.Instance.ArenaWidth.x ||
+			transform.position.x > GameManager.Instance.ArenaWidth.y ||
+			transform.position.y < GameManager.Instance.ArenaHeight.x ||
+			transform.position.y > GameManager.Instance.ArenaHeight.y) {
+			Reset(true);
 		}
 	}
 

@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameState currentGameState;
 	[SerializeField] private GameObject homePrefab, awayPrefab;
 	[SerializeField] private GameObject homeFormationPrefab, awayFormationPrefab;
+	[SerializeField] private GameObject humanPrefab;
 	private Formation[] homeFormation, awayFormation;
 	private int homeScore, awayScore;
 	private Team lastScoringTeam;
@@ -67,6 +68,7 @@ public class GameManager : MonoBehaviour {
 	private Player homePlayerNearestBall, awayPlayerNearestBall, playerNearestBall;
 	private bool isTraining;
 	public Vector2 ArenaWidth, ArenaHeight;
+	public float TimeScale = 1f;
 
 	private List<Collider2D> projectedBallCollisionObjects = new List<Collider2D>();
 	private void Awake() {
@@ -80,6 +82,11 @@ public class GameManager : MonoBehaviour {
 		awayFormation = Instantiate(awayFormationPrefab, transform).GetComponentsInChildren<Formation>();
 
 		Application.targetFrameRate = 60;
+		Time.timeScale = TimeScale;
+	}
+	[ContextMenu("Update Timescale")]
+	private void UpdateTimeScale() {
+		Time.timeScale = TimeScale;
 	}
 
 	private void Start() {
@@ -118,9 +125,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void SetIsTransitioning(bool _value) {
-		Debug.Log($"Trying to set transitioning to {_value}");
+		//Debug.Log($"Trying to set transitioning to {_value}");
 		if(TransitioningToFaceoffPos == _value) {
-			Debug.Log($"Exiting transition because they're equal.");
+			//Debug.Log($"Exiting transition because they're equal.");
 			return;
 		}
 		TransitioningToFaceoffPos = _value;
@@ -151,9 +158,19 @@ public class GameManager : MonoBehaviour {
 
 			yield return new WaitForSeconds(dataCollectionRate);
 		}
+		EndAllAgentEpisodes();
 		yield return new WaitForSeconds(.3f);
 		//Debug.Log("All players have transitioned");
 		SetIsTransitioning(false);
+	}
+
+	private void EndAllAgentEpisodes() {
+		for (int i = 0; i < allPlayers.Count; i++) {
+			PlayerAgent _agent = allPlayers[i].GetAgent();
+			if (_agent) {
+				_agent.EndEpisode();
+			}
+		}
 	}
 
 	private void UpdatePlayersNearestBall() {
@@ -205,6 +222,10 @@ public class GameManager : MonoBehaviour {
 		return _team == Team.Home ? homePrefab : awayPrefab;
 	}
 
+	public GameObject GetHumanPrefab() {
+		return humanPrefab;
+	}
+
 
 	private void ApplyFormations(Team _teamKickingOff) {
 		ProcessFormation(_teamKickingOff, Team.Home);
@@ -245,7 +266,7 @@ public class GameManager : MonoBehaviour {
 
 
 
-	public float simulationTime = 1.0f;
+	public float ballSimulationTime = 1.0f;
 	public int numPoints = 100;
 	public float pointSpacing = 0.1f;
 	public LayerMask collisionLayer;
@@ -263,7 +284,7 @@ public class GameManager : MonoBehaviour {
 		projectedBallCollisionObjects.Clear();
 		Vector2 currentPosition = ball.transform.position;
 		Vector2 currentVelocity = ball.GetVelocity();
-		float timeStep = simulationTime / numPoints;
+		float timeStep = ballSimulationTime / numPoints;
 		float drag = ball.GetComponent<Rigidbody2D>().drag;
 		
 		Collider2D ballCollider = ball.GetComponent<Collider2D>();
@@ -450,8 +471,12 @@ public class GameManager : MonoBehaviour {
 		ball.SetBallCarrier(_value);
 	}
 
+	public bool GetIsTraining() {
+		return isTraining;
+	}
+
 	public void SetGameState(GameState _value) {
-		if(_value == currentGameState && _value != GameState.Training) {
+		if((_value == GameState.Kickoff && timer != maxTime) && (_value == currentGameState && _value != GameState.Training)) {
 			return;
 		}
 		currentGameState = _value;
@@ -527,7 +552,9 @@ public class GameManager : MonoBehaviour {
 		foreach (Player _player in _scoringTeamPlayers) {
 			_player.SetIsCheering(true);
 		}
+		ball.Reset(false);
 		yield return new WaitForSeconds(3f);
+		ball.Reset(false);
 		foreach (Player _player in _scoringTeamPlayers) {
 			_player.SetIsCheering(false);
 		}
@@ -536,11 +563,13 @@ public class GameManager : MonoBehaviour {
 		float _savedSpeed = standardSpeed;
 		standardSpeed = returnToFormationSpeed;
 		yield return new WaitUntil(() => !GetIsTransitioning());
+		ball.Reset(false);
 		StartCoroutine(SetGameStateAfterDelay(GameState.Kickoff, .1f));
 		standardSpeed = _savedSpeed;
 	}
 
 	IEnumerator Whistle() {
+		ball.Reset(false);
 		canMove = false;
 		foreach (Player _player in allPlayers) {
 			_player.Reset();
@@ -550,7 +579,9 @@ public class GameManager : MonoBehaviour {
 		ApplyFormations(lastScoringTeam == Team.Home ? Team.Away : Team.Home);
 		float _savedSpeed = standardSpeed;
 		standardSpeed = returnToFormationSpeed;
+		ball.Reset(false);
 		yield return new WaitUntil(() => !GetIsTransitioning());
+		ball.Reset(false);
 		StartCoroutine(SetGameStateAfterDelay(GameState.Kickoff, .1f));
 		standardSpeed = _savedSpeed;
 	}

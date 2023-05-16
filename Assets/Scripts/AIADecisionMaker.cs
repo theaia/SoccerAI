@@ -23,31 +23,26 @@ public class AIADecisionMaker : MonoBehaviour
 
 	IEnumerator MakeDecision() {
 		while (true) {
-			if (!GameManager.Instance || !player || !GameManager.Instance.GetCanMove()) {
-				yield return null;
-			}
-
-			if (GameManager.Instance.GetIsTransitioning()) {
-				aiaStar.SetTarget(player.GetFormationLocation());
-				yield return null;
-			}
-
-			localPerception = player.GetLocalPerception();
-			ballCarrier = GameManager.Instance.GetBallCarrier();
-			switch (player.GetRole()) {
-				default:
-				case PlayStyle.Defender:
-					MakeDecisionAsDefender();
-					break;
-				case PlayStyle.Playmaker:
-					MakeDecisionAsPlaymaker();
-					break;
-				case PlayStyle.Striker:
-					MakeDecisionAsStriker();
-					break;
-				case PlayStyle.Goalie:
-					MakeDecisionAsGoalie();
-					break;
+			bool _canDecide = GameManager.Instance && player && GameManager.Instance.GetCanMove() && !GameManager.Instance.GetIsTransitioning();
+			if (_canDecide) {
+				localPerception = player.GetLocalPerception();
+				ballCarrier = GameManager.Instance.GetBallCarrier();
+				switch (player.GetRole()) {
+					default:
+					case Role.Defender:
+						MakeDecisionAsDefender();
+						break;
+					case Role.Playmaker:
+						MakeDecisionAsPlaymaker();
+						break;
+					case Role.Striker:
+						MakeDecisionAsStriker();
+						break;
+					case Role.Goalie:
+						MakeDecisionAsGoalie();
+						break;
+				}
+				//Debug.Log($"{player.name} making decisions as {player.GetRole()}. Is transitioning: {GameManager.Instance.GetIsTransitioning()}");
 			}
 			yield return new WaitForSeconds(decisionRate);
 		}
@@ -88,6 +83,7 @@ public class AIADecisionMaker : MonoBehaviour
 
 	#region Striker
 	private void MakeDecisionAsStriker() {
+		//Debug.Log("Making decisions as striker");
 		TryGetBall(true);
 		player.SetSprint(false);
 		//Player is closest on team to loose ball or opponent with ball
@@ -120,12 +116,10 @@ public class AIADecisionMaker : MonoBehaviour
 		}
 
 		//When ball is loose in own zone
-		bool _IsBallInOwnZone = Utils.IsV2LocationInZone(GameManager.Instance.GetBallLocation(), player.GetTeam());
-		//Debug.Log($"Is ball in own zone for {gameObject.name}? {_IsBallInOwnZone}");
-		if (!ballCarrier && _IsBallInOwnZone) {
+		if (IsBallInDefendingZone() && !TeamHasBall()) {
 			MoveToBall();
 			return;
-		} else if(!ballCarrier && !_IsBallInOwnZone) {
+		} else if(!ThisPlayerHasBall()) {
 			MoveToFormation();
 			return;
 		}
@@ -170,16 +164,6 @@ public class AIADecisionMaker : MonoBehaviour
 		TryGetBall();
 	}
 	#endregion
-	private void ClearTheBall() {
-		string[] _tag = new string[] { Utils.GetOpposingPlayerTag(player), "stadium" };
-
-		int _dirToMove = Utils.GetDirWithoutTags(player, localPerception, _tag, DirectionType.ForwardPreferredNeutral);
-		if (_dirToMove == -1) {
-			return;
-		}
-
-		AttemptKick(_dirToMove, GameManager.Instance.maxChargeTime * .5f);
-	}
 
 	private void TryGetBall(bool _staminaCheck = false) {
 		//Debug.Log($"{player.name} is trying to get ball");
@@ -187,8 +171,8 @@ public class AIADecisionMaker : MonoBehaviour
 			Player _ballCarrier = GameManager.Instance.GetBallCarrier();
 
 			//Attempt to take the ball from the opposing player or a freeball
-			if (!_ballCarrier || (_ballCarrier && _ballCarrier.GetTeam() != player.GetTeam())) {
-				if(_staminaCheck && _ballCarrier && _ballCarrier.GetCurrentStamina() > player.GetCurrentStamina()) {
+			if (IsBallLoose() || OpponentHasBall()) {
+				if(_staminaCheck && BallCarrierHasMoreStamina()) {
 					return;
 				}
 				player.SetAbility(true);
@@ -252,7 +236,7 @@ public class AIADecisionMaker : MonoBehaviour
 			}
 
 			if (_currentDirIsToBeAvoided == false) {
-				Utils.DebugDir(_dir, transform.position);
+				//Utils.DebugDir(_dir, transform.position);
 				player.SetMovement(_currentMoveInput);
 				return;
 			} else {
@@ -340,6 +324,20 @@ public class AIADecisionMaker : MonoBehaviour
 
 	private bool OpponentHasBall() {
 		return AnyPlayerHasBall() && ballCarrier.GetTeam() != player.GetTeam();
+	}
+
+	private bool BallCarrierHasLessStamina() {
+		if(ballCarrier == null) {
+			return true;
+		}
+		return ballCarrier.GetCurrentStamina() < player.GetCurrentStamina();
+	}
+
+	private bool BallCarrierHasMoreStamina() {
+		if (ballCarrier == null) {
+			return false;
+		}
+		return ballCarrier.GetCurrentStamina() > player.GetCurrentStamina();
 	}
 
 	private bool IsClosestOnTeamToBall() {

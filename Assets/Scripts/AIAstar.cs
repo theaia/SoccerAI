@@ -9,10 +9,11 @@ public class AIAstar : MonoBehaviour {
 
     private float repathRate = 10f;
     private float lastRepath = float.NegativeInfinity;
+    Vector2? lastMove = null;
 
     int currentWaypoint = 0;
     [HideInInspector] public bool reachedEndOfPath;
-    private float nextWaypointDistance = .01f;
+    [SerializeField] private float nextWaypointDistance = .02f;
 
     public void Start() {
         seeker = GetComponent<Seeker>();
@@ -24,14 +25,18 @@ public class AIAstar : MonoBehaviour {
 	}
 
     public void SetTarget(Vector2 _targetPosition) {
-        if(targetPosition.HasValue && Vector2.Distance(_targetPosition, targetPosition.Value) < .01f) {
+        if(GameManager.Instance && !GameManager.Instance.GetIsTransitioning() && targetPosition.HasValue && Vector2.Distance(_targetPosition, targetPosition.Value) < .04f) {
             //Debug.Log($"Exiting Set target because target: {targetPosition.HasValue} && target disance to existing is less than .01");
             return;
 		}
 
-        if(GameManager.Instance.GetIsTransitioning() && _targetPosition != player.GetFormationLocation()) {
+        if(_targetPosition == targetPosition) {
             return;
 		}
+
+        if(GameManager.Instance && GameManager.Instance.GetIsTransitioning()) {
+            _targetPosition = player.GetFormationLocation();
+        }
 
         targetPosition = _targetPosition;
         //Debug.Log($"Target position for {gameObject.name} on {player.GetTeam()} set to {targetPosition}");
@@ -48,15 +53,19 @@ public class AIAstar : MonoBehaviour {
             return;
 		}
         ProcessPath();
-
+        if(transform)
         if (!reachedEndOfPath && path != null) {
             Vector3 _target = path.vectorPath[currentWaypoint];
-            Vector3 dir = (_target - transform.position).normalized;
+            Vector3 dir = _target - transform.position;
+            //Debug.Log($"Raw Dir: {dir}");
             dir = Utils.DirToClosestInput(dir);
-            //Debug.DrawLine(_target, _target + Vector3.left * .1f, Color.cyan);
+            //Debug.DrawLine(_target, _target + dir * .1f, Color.cyan);
+            //Debug.Log($"{player.name} | Target: {_target} | Transform: {transform.position} | Dir: {dir}");
             //Debug.Log(dir);
+            lastMove = dir;
             player.SetMovement(dir);
         } else {
+            lastMove = Vector2.zero;
             player.SetMovement(Vector2.zero);
         }
     }
@@ -66,13 +75,17 @@ public class AIAstar : MonoBehaviour {
     }
 
 	private void ProcessPath() {
-        if (Time.time > lastRepath + repathRate && seeker.IsDone()) {
+		if (!seeker) {
+            return;
+		}
+
+        /*if (Time.time > lastRepath + repathRate && seeker.IsDone()) {
             lastRepath = Time.time;
 
             // Start a new path to the targetPosition, call the the OnPathComplete function
             // when the path has been calculated (which may take a few frames depending on the complexity)
             seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
-        }
+        }*/
 
         if (path == null) {
             // We have no path to follow yet, so don't do anything
@@ -108,7 +121,7 @@ public class AIAstar : MonoBehaviour {
     }
 
     private void GoToTargetPosition() {
-        if(seeker != null && path != null) seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
+        if(seeker != null && targetPosition.HasValue) seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
     }
 
     public void OnPathComplete(Path p) {

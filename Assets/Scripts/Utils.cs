@@ -97,7 +97,7 @@ public static class Utils{
     public static RaycastHit2D[] GetDirectionInfo(Vector2 _origin, int _value) {
         Vector2 _input = IntDirToInput(_value);
         //Debug.DrawRay(_origin, _input, Color.red);
-        Debug.DrawLine(_origin, _origin + (_input * 1f), Color.red, .1f);
+        //Debug.DrawLine(_origin, _origin + (_input * 1f), Color.red, .1f);
         RaycastHit2D[] _hits = Physics2D.RaycastAll(_origin, _input, 1f, GameManager.Instance.DirectionLayersToCheck);
         return _hits;
     }
@@ -118,28 +118,6 @@ public static class Utils{
         }
         return -1; //Default return value if none found
 	}
-
-    /*public static int GetRandomCollisionWithoutTags(Vector2 _origin, string[] _tags, List<int> _dirs = null) {
-        if (_dirs == null) {
-            _dirs = GetAllDirections();
-        }
-
-        _dirs = RandomSortList(_dirs);
-
-        foreach (int _dir in _dirs) {
-            RaycastHit2D[] _hits = GetDirectionInfo(_origin, _dir);
-            foreach (RaycastHit2D _hit in _hits) {
-                if (_hit.collider != null) {
-                    for (int i = 0; i < _tags.Length; i++) {
-                        if (_hit.collider.CompareTag(_tags[i])) {
-                            return _dir;
-                        }
-                    }
-                } 
-            } 
-        }
-        return _dirs[Random.Range(0, _dirs.Count)]; //Default return value if none found
-    }*/
 
     public static int GetDirWithoutTags(Player _player, string[] _perception, string[] _tags, DirectionType _dirType) {
         List<int> _dirs = GetDirs(_player, _dirType);
@@ -375,8 +353,8 @@ public static class Utils{
 
     public static Vector2? Intersection(Vector2 pointA1, Vector2 dirA, Vector2 pointB1, Vector2 dirB) {
         // Line A represented as a1x + b1y = c1
-        Debug.DrawRay(pointA1, dirA, Color.white, 1f);
-        Debug.DrawRay(pointB1, dirB, Color.black, 1f);
+        //Debug.DrawRay(pointA1, dirA, Color.white, 1f);
+        //Debug.DrawRay(pointB1, dirB, Color.black, 1f);
         float a1 = dirA.y;
         float b1 = -dirA.x;
         float c1 = a1 * pointA1.x + b1 * pointA1.y;
@@ -427,6 +405,7 @@ public static class Utils{
         float _newY = Mathf.Clamp(_value.y, GameManager.Instance.ArenaHeight.x + _topMargins, GameManager.Instance.ArenaHeight.y - _topMargins);
         return new Vector2(_newX, _newY);
 	}
+
 }
 
 public enum DirectionType {
