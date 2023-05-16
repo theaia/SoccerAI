@@ -19,7 +19,6 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameState currentGameState;
 	[SerializeField] private GameObject homePrefab, awayPrefab;
 	[SerializeField] private GameObject homeFormationPrefab, awayFormationPrefab;
-	[SerializeField] private GameObject humanPrefab;
 	private Formation[] homeFormation, awayFormation;
 	private int homeScore, awayScore;
 	private Team lastScoringTeam;
@@ -220,10 +219,6 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject GetPlayerPrefab(Team _team) {
 		return _team == Team.Home ? homePrefab : awayPrefab;
-	}
-
-	public GameObject GetHumanPrefab() {
-		return humanPrefab;
 	}
 
 
