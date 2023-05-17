@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using Unity.Barracuda;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public static class Utils{
@@ -405,6 +408,91 @@ public static class Utils{
         return new Vector2(_newX, _newY);
 	}
 
+
+	public static CountryInfo GetCountryInfo(Country targetCountry) {
+        //Debug.Log("Getting country info");
+        List<CountryInfo> _allCountryInfo = LoadAllScriptableObjectsOfType<CountryInfo>();
+		foreach (CountryInfo _countryInfo in _allCountryInfo) {
+			if (_countryInfo.Country == targetCountry) {
+				//Debug.Log("Country found! " + _countryInfo.Abbreviation);
+				return _countryInfo;
+			}
+		}
+		//Debug.Log("Returning null");
+		return null;
+	}
+
+	public static List<T> LoadAllScriptableObjectsOfType<T>() where T : ScriptableObject {
+		string[] guids = AssetDatabase.FindAssets("t:" + typeof(T).Name);
+		List<T> list = new List<T>();
+
+		foreach (string guid in guids) {
+			string path = AssetDatabase.GUIDToAssetPath(guid);
+			T asset = AssetDatabase.LoadAssetAtPath<T>(path);
+			list.Add(asset);
+		}
+
+		return list;
+	}
+
+    public static State GetState(Vector2 _input) {
+		if (_input.x == 0 && _input.y > 0) {
+			return State.up;
+
+		} else if (_input.x > 0 && _input.y > 0) {
+			return State.rightup;
+
+		} else if (_input.x > 0 && _input.y == 0) {
+			return State.right;
+
+
+		} else if (_input.x > 0 && _input.y < 0) {
+			return State.rightdown;
+
+
+		} else if (_input.x == 0 && _input.y < 0) {
+			return State.down;
+
+
+		} else if (_input.x < 0 && _input.y < 0) {
+			return State.leftdown;
+
+
+		} else if (_input.x < 0 && _input.y == 0) {
+			return State.left;
+
+
+		} else if (_input.x < 0 && _input.y > 0) {
+			return State.leftup;
+
+
+		} else {
+			return State.idle;
+		}
+	}
+
+    public static Vector2 GetTargetBallPosFromState(State state) {
+		switch(state) { 
+            case State.up:
+				return new Vector2(0f, 0.06f);
+            case State.rightup:
+				return new Vector2(0.04f, 0.04f);
+            case State.right:
+				return new Vector2(0.06f, 0f);
+            case State.rightdown:
+				return new Vector2(0.04f, -0.04f);
+            case State.down:
+                return new Vector2(0f, -0.06f);
+            case State.leftdown:
+				return new Vector2(-0.04f, -0.04f);
+			case State.left:
+				return new Vector2(-0.06f, 0f);
+            case State.leftup:
+				return new Vector2(-0.04f, 0.04f);
+            default:
+                return new Vector2(0f, 0f);
+        }
+	}
 }
 
 public enum DirectionType {

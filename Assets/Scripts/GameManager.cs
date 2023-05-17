@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum GameState{
 	Paused,
@@ -17,15 +18,33 @@ public enum GameState{
 public class GameManager : MonoBehaviour {
 	public static GameManager Instance;
 	[SerializeField] private GameState currentGameState;
-	[SerializeField] private GameObject homePrefab, awayPrefab;
-	[SerializeField] private GameObject homeFormationPrefab, awayFormationPrefab;
-	private Formation[] homeFormation, awayFormation;
-	private int homeScore, awayScore;
+
+	[Header("Teams")]
+	[SerializeField] private GameObject homePrefab;
+	[SerializeField] private GameObject awayPrefab;
+	[SerializeField] private GameObject homeFormationPrefab;
+	[SerializeField] private GameObject awayFormationPrefab;
+	private Formation[] homeFormation;
+	private Formation[] awayFormation;
+
+
+	private int homeScore;
+	private int awayScore;
 	private Team lastScoringTeam;
 	private float timer;
 	private float maxTime = 3f * 60f;
-	[SerializeField] private TextMeshProUGUI homeScoreText, awayScoreText, timerText;
+	[Header("General")]
+	[SerializeField] private TextMeshProUGUI homeScoreText;
+	[SerializeField] private TextMeshProUGUI awayScoreText;
+	[SerializeField] private TextMeshProUGUI timerText;
+	[SerializeField] private TextMeshProUGUI homeAbrvText;
+	[SerializeField] private TextMeshProUGUI awayAbrvText;
+	[SerializeField] private Image homeFlag;
+	[SerializeField] private Image awayFlag;
+	[SerializeField] private GameObject[] skins;
 	public LayerMask DirectionLayersToCheck;
+	public Vector2 ArenaWidth, ArenaHeight;
+	public float TimeScale = 1f;
 
 	public float standardSpeed { get; private set; } = 20f;
 	public float sprintSpeed { get; private set; } = 27f;
@@ -44,9 +63,6 @@ public class GameManager : MonoBehaviour {
 	public float ShotCooldown { get; private set; } = 2f;
 	public int animFrameRate { get; private set; } = 24;
 	public float PerceptionLength { get; private set; } = .75f;
-	[Space(10)]
-	[SerializeField] GameObject[] HomeCharacterSprites;
-	[SerializeField] GameObject[] AwayCharacterSprites;
 
 	[Header("Ball")]
 	[SerializeField] private Ball ball;
@@ -66,8 +82,8 @@ public class GameManager : MonoBehaviour {
 	private float dataCollectionRate = .1f;
 	private Player homePlayerNearestBall, awayPlayerNearestBall, playerNearestBall;
 	private bool isTraining;
-	public Vector2 ArenaWidth, ArenaHeight;
-	public float TimeScale = 1f;
+
+	private CountryInfo homeCountryInfo, awayCountryInfo;
 
 	private List<Collider2D> projectedBallCollisionObjects = new List<Collider2D>();
 	private void Awake() {
@@ -86,6 +102,29 @@ public class GameManager : MonoBehaviour {
 	[ContextMenu("Update Timescale")]
 	private void UpdateTimeScale() {
 		Time.timeScale = TimeScale;
+	}
+
+	public CountryInfo GetCountryInfo(Team _team) {
+		return _team == Team.Home ? homeCountryInfo : awayCountryInfo;
+	}
+
+	public void SetCountryInfo(Team _team, CountryInfo _countryInfo) {
+		Debug.Log($"Setting country info for {_team} to {_countryInfo.name}");
+		if(_countryInfo == null) {
+			return;
+		}
+
+		if(_team == Team.Home) {
+			homeCountryInfo = _countryInfo;
+			homeAbrvText.text = homeCountryInfo.Abbreviation;
+			homeAbrvText.color = homeCountryInfo.HomeJerseyColor;
+			homeFlag.sprite = homeCountryInfo.Flag;
+		} else {
+			awayCountryInfo = _countryInfo;
+			awayAbrvText.text = awayCountryInfo.Abbreviation;
+			awayAbrvText.color = awayCountryInfo.AwayJerseyColor;
+			awayFlag.sprite = awayCountryInfo.Flag;
+		}
 	}
 
 	private void Start() {
@@ -114,7 +153,9 @@ public class GameManager : MonoBehaviour {
 			UpdatePlayersNearestBall();
 		}
 	}
-
+	public GameObject GetRandomSkin() {
+		return skins[UnityEngine.Random.Range(0, skins.Length)];
+	}
 	public Team GetLastScoringTeam() {
 		return lastScoringTeam;
 	}
@@ -264,7 +305,7 @@ public class GameManager : MonoBehaviour {
 	public float ballSimulationTime = 1.0f;
 	public int numPoints = 100;
 	public float pointSpacing = 0.1f;
-	public LayerMask collisionLayer;
+	public LayerMask ballSimCollisionLayers;
 	private Vector2 finalPosition;
 	public float lineDuration = 0.1f;
 
@@ -286,7 +327,7 @@ public class GameManager : MonoBehaviour {
 
 		ContactFilter2D contactFilter = new ContactFilter2D();
 		contactFilter.useTriggers = true;
-		contactFilter.SetLayerMask(collisionLayer);
+		contactFilter.SetLayerMask(ballSimCollisionLayers);
 		contactFilter.useLayerMask = true;
 
 		Gizmos.color = Color.red;
@@ -456,11 +497,6 @@ public class GameManager : MonoBehaviour {
 		"Dybala",
 		"Oblak",
 	};
-
-	public GameObject GetRandomTeamPrefab(Team team) {
-		GameObject _randomPrefab = team == Team.Home ? HomeCharacterSprites[UnityEngine.Random.Range(0, HomeCharacterSprites.Length - 1)] : AwayCharacterSprites[UnityEngine.Random.Range(0, AwayCharacterSprites.Length - 1)];
-		return _randomPrefab;
-	}
 
 	public void SetBallCarrier(Player _value) {
 		ball.SetBallCarrier(_value);

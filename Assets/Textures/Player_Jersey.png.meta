@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: cbd76bba8fa9174419cd5a5564665763
+guid: 05d23df3c0589464589c0322d1473481
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -105,1786 +105,1576 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_0
+      name: Player_Jersey_0
       rect:
         serializedVersion: 2
         x: 0
         y: 240
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ff6c94035be7182438a602c04857d910
-      internalID: 1507293997
+      spriteID: 3eda12484b6808a46b83e928ff45a353
+      internalID: 129017810
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_1
+      name: Player_Jersey_1
       rect:
         serializedVersion: 2
         x: 16
         y: 240
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cdc481bcb50bee04cb51c21db69beb8f
-      internalID: 1620663328
+      spriteID: 08e348b2b5d69c74eb57c69905568958
+      internalID: 1907270013
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_2
+      name: Player_Jersey_2
       rect:
         serializedVersion: 2
         x: 32
         y: 240
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 709bb0b7e977f9d439e10d43d65e294d
-      internalID: 199204359
+      spriteID: 7749f5da270a9cd4586693da716f302f
+      internalID: -2107861449
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_3
+      name: Player_Jersey_3
       rect:
         serializedVersion: 2
         x: 48
         y: 240
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5c3c345b005a9b344adbbbd828eea0c5
-      internalID: 1576131735
+      spriteID: a21dffd44c1eaee449a9201a348ebb44
+      internalID: -716215631
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_4
+      name: Player_Jersey_4
       rect:
         serializedVersion: 2
         x: 80
         y: 240
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cfc7259620c0f8642a6d4abafb446666
-      internalID: 1733344123
+      spriteID: c2239e7a5b4938e488e94c315864f17b
+      internalID: -431724836
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_5
+      name: Player_Jersey_5
       rect:
         serializedVersion: 2
         x: 0
         y: 224
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 680a91ce9fc939e4095a94b16164852c
-      internalID: -461107575
+      spriteID: c606b5eddf764624d84f02b345b12cb6
+      internalID: 2004085204
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_6
+      name: Player_Jersey_6
       rect:
         serializedVersion: 2
         x: 16
         y: 224
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7df6bb392616fa64ba9c001f46aec90f
-      internalID: 1792455330
+      spriteID: 6999713b14ec13e4384019c778bb9e59
+      internalID: 693775255
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_7
+      name: Player_Jersey_7
       rect:
         serializedVersion: 2
         x: 32
         y: 224
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 71b37093b360eb7428cf377689af82f7
-      internalID: -185683406
+      spriteID: c761945c0b1c52240a9b32126a54337f
+      internalID: -1424424230
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_8
+      name: Player_Jersey_8
       rect:
         serializedVersion: 2
         x: 48
         y: 224
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ca9565988cf27154a83d9cd072dc3063
-      internalID: 48752561
+      spriteID: b54d65b6734c447438b57a0924d33c00
+      internalID: -1550326067
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_9
+      name: Player_Jersey_9
       rect:
         serializedVersion: 2
         x: 80
         y: 224
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 10e451b3ae7f34e49a3303251d9c4089
-      internalID: 307240507
+      spriteID: b8e7d5c3119e44b4085679f9a09b46b3
+      internalID: 526271172
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_10
+      name: Player_Jersey_10
       rect:
         serializedVersion: 2
         x: 0
         y: 208
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 477b29ff210b8784c8cd95d6fa7ab6f2
-      internalID: 1045888485
+      spriteID: 9499dec8479540540b2ef7623933800f
+      internalID: -994717366
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_11
+      name: Player_Jersey_11
       rect:
         serializedVersion: 2
         x: 16
         y: 208
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 27e4287b42583ff40809f66a53d6e0cc
-      internalID: -2082955861
+      spriteID: 6796f1465e9f55b4390b90ea265a0f49
+      internalID: -989922882
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_12
+      name: Player_Jersey_12
       rect:
         serializedVersion: 2
         x: 32
         y: 208
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a8bc064ee52ea444ca548df1342562fd
-      internalID: -2004701629
+      spriteID: 2a3f0e709eac23e4d9ad0d8d99327c85
+      internalID: 2043071291
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_13
+      name: Player_Jersey_13
       rect:
         serializedVersion: 2
         x: 48
         y: 208
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b95eed44d6fa3194d9d7fb0fddf16a82
-      internalID: -995735946
+      spriteID: 5ccb835f4ff672448acca44a5b30e1a8
+      internalID: -564771792
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_14
+      name: Player_Jersey_14
       rect:
         serializedVersion: 2
         x: 80
         y: 208
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4fe715cef805009468494abc3755c1dd
-      internalID: 684377126
+      spriteID: 7bba3406b8714be4a8731e1e726c5e7e
+      internalID: -1050694043
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_15
+      name: Player_Jersey_15
       rect:
         serializedVersion: 2
         x: 0
         y: 192
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c64aea792d11cca4299dbffef311c76b
-      internalID: 1152398923
+      spriteID: ae785e5e8c31d9f4b88382e0b797109d
+      internalID: -998311826
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_16
+      name: Player_Jersey_16
       rect:
         serializedVersion: 2
         x: 16
         y: 192
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8a5c9305102b03a4aaf9f5139e3fa751
-      internalID: -1073272262
+      spriteID: 5b75d511a26ce6c4da11dc5acdd7aa5e
+      internalID: 614738582
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_17
+      name: Player_Jersey_17
       rect:
         serializedVersion: 2
         x: 32
         y: 192
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 82c3b27d5e986c34fa5c2de5564511c7
-      internalID: 167110027
+      spriteID: 13dc63b513056694783084b8026c1428
+      internalID: 523357375
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_18
+      name: Player_Jersey_18
       rect:
         serializedVersion: 2
         x: 48
         y: 192
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8b1264f313b4b824aaaaef72abd57493
-      internalID: -658286519
+      spriteID: 2a74da77f2a452744b943ca8fe39c9fa
+      internalID: 1230956942
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_19
+      name: Player_Jersey_19
       rect:
         serializedVersion: 2
         x: 80
         y: 192
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 360ec87eb1d2e7c4d9699a90a30b3034
-      internalID: -1604172281
+      spriteID: ad32edec4f1db7a42adfdfc3dff6ee95
+      internalID: 757178465
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_20
+      name: Player_Jersey_20
       rect:
         serializedVersion: 2
         x: 0
         y: 176
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5663fc551b9ac094fbb7e66409038516
-      internalID: -1823276877
+      spriteID: 2dcda5a709b1bd74b9f8d5ecbc61b318
+      internalID: 1472483358
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_21
+      name: Player_Jersey_21
       rect:
         serializedVersion: 2
         x: 16
         y: 176
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7475027eb31333444b278fe457dd2615
-      internalID: 321450865
+      spriteID: 94d892be4ca2277498b72fcb1c382cd3
+      internalID: 1273156965
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_22
+      name: Player_Jersey_22
       rect:
         serializedVersion: 2
         x: 32
         y: 176
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b72e422eab112794085ceb020bf8635d
-      internalID: -1969035651
+      spriteID: 057e69e9d63a52946bf213af89baa05d
+      internalID: -397531717
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_23
+      name: Player_Jersey_23
       rect:
         serializedVersion: 2
         x: 48
         y: 176
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bf46057eae99f674b9fe7523c39eceff
-      internalID: 559477630
+      spriteID: 4ecf232908e5d164d9ac9bd022fca9e2
+      internalID: -56969625
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_24
+      name: Player_Jersey_24
       rect:
         serializedVersion: 2
         x: 80
         y: 176
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6f3d39f2f5d626a4e8f56d02e7f3e5ab
-      internalID: 434374841
+      spriteID: 98c681dab94a42743bed45074710cde2
+      internalID: -1219686507
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_25
+      name: Player_Jersey_25
       rect:
         serializedVersion: 2
         x: 0
         y: 160
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d13d48c1f93b20e4eaafa34aefb1c275
-      internalID: 1969197438
+      spriteID: e6c056b960381014e9bb95ecb9f2ae4f
+      internalID: -701697555
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_26
+      name: Player_Jersey_26
       rect:
         serializedVersion: 2
         x: 16
         y: 160
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 44b24845433ccf34988ee25bc0f5411b
-      internalID: 1975600825
+      spriteID: 5173c78776ea51a45a521174a3b6c072
+      internalID: -681338459
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_27
+      name: Player_Jersey_27
       rect:
         serializedVersion: 2
         x: 32
         y: 160
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0e9a95e9476cd484ebfd04f78d73d671
-      internalID: 61377962
+      spriteID: 4b460f79cc0f3544491ab1b1b7d9f01f
+      internalID: -741010217
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_28
+      name: Player_Jersey_28
       rect:
         serializedVersion: 2
         x: 48
         y: 160
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d0f2672cc659a9447ad539a4f6a53dc6
-      internalID: -275676415
+      spriteID: 21d1805f15593084cb16ec0f8b80f77d
+      internalID: -1074732449
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_29
+      name: Player_Jersey_29
       rect:
         serializedVersion: 2
         x: 80
         y: 160
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ed7080c376600b349904144dd44de370
-      internalID: 1831681897
+      spriteID: 750b4fb6d7da62141ade39c8ed2f8722
+      internalID: 656683373
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_30
+      name: Player_Jersey_30
       rect:
         serializedVersion: 2
         x: 0
         y: 144
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 63c66aa3247e3144482d9840e4f627c7
-      internalID: 598832358
+      spriteID: f9e0f16f3c69ef64692182864f4de2fa
+      internalID: -429600966
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_31
+      name: Player_Jersey_31
       rect:
         serializedVersion: 2
         x: 16
         y: 144
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e0eae9c6f061c5348b681d915ff7ddd1
-      internalID: 636629708
+      spriteID: 21cdd49567d69cc47a96817f1faa789c
+      internalID: 1820921022
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_32
+      name: Player_Jersey_32
       rect:
         serializedVersion: 2
         x: 32
         y: 144
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ddcf147bf75d49a42b1977636852d79b
-      internalID: 1677697802
+      spriteID: e8f4a911d9d866a4fb0e178769100e80
+      internalID: 718641094
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_33
+      name: Player_Jersey_33
       rect:
         serializedVersion: 2
         x: 48
         y: 144
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4ebb7b1e6896a534ebd45311120450e9
-      internalID: -1385235611
+      spriteID: 478a1b209cb030446ab1d8594e72eacb
+      internalID: 126789063
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_34
+      name: Player_Jersey_34
       rect:
         serializedVersion: 2
         x: 80
         y: 144
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3bed5987c6dfcd747bbfb376838d94d6
-      internalID: 914744016
+      spriteID: 7e9fd44d3e1da774cbae5568b7561cd0
+      internalID: 381914639
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_35
+      name: Player_Jersey_35
       rect:
         serializedVersion: 2
         x: 0
         y: 128
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4fd993a0e1ab00a45b14a55d43636deb
-      internalID: -242983313
+      spriteID: 66760d03573374a4ebc40bd6b321efa2
+      internalID: -1536241002
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_36
+      name: Player_Jersey_36
       rect:
         serializedVersion: 2
         x: 16
         y: 128
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fe54753c7f9c87044b64378bcc3f8294
-      internalID: 804097532
+      spriteID: 97fed824f4d85f9468d64b7b3e93d38c
+      internalID: -353579273
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_37
+      name: Player_Jersey_37
       rect:
         serializedVersion: 2
         x: 32
         y: 128
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e8fc8985424287944a584aeb588ff543
-      internalID: -1522027661
+      spriteID: 1117280f9f5702b4c807424c639b4297
+      internalID: -1515597874
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_38
+      name: Player_Jersey_38
       rect:
         serializedVersion: 2
         x: 48
         y: 128
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1f2df45217a2e95438bc096f98f77d3c
-      internalID: -888489894
+      spriteID: 2b8e053d6ee5a4f4586f3ea3b4507d9d
+      internalID: 1063484910
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_39
+      name: Player_Jersey_39
       rect:
         serializedVersion: 2
         x: 80
         y: 128
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2d086f12163d80b408b8f14962f5d6db
-      internalID: 1901325989
+      spriteID: f58c5b6642f74d84887c170a0ab86786
+      internalID: 51738631
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_40
+      name: Player_Jersey_40
       rect:
         serializedVersion: 2
         x: 0
         y: 112
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9e3c02662c9f03b45bb8fa3b88394dca
-      internalID: 221497998
+      spriteID: 9759a56c0f0462b44870a71f4d269366
+      internalID: -1603053307
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_41
+      name: Player_Jersey_41
       rect:
         serializedVersion: 2
         x: 16
         y: 112
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a990e1e7294eb8b43b7db5e635f7acb0
-      internalID: 2124526212
+      spriteID: 60a29c197acf7a545b711511321421e1
+      internalID: -1112308925
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_42
+      name: Player_Jersey_42
       rect:
         serializedVersion: 2
         x: 32
         y: 112
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4e4284c0bfe255141bd498fdb50a96c0
-      internalID: -1884860367
+      spriteID: b0bf3b0ed55ef2c41ae25cb3b2285d61
+      internalID: -151658588
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_43
+      name: Player_Jersey_43
       rect:
         serializedVersion: 2
         x: 48
         y: 112
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 33b0fbcd0b5f36e4d96e8becb2105323
-      internalID: 517081093
+      spriteID: 94d34e0fb25ccd8488f9c748b292fca4
+      internalID: -1840594275
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_44
+      name: Player_Jersey_44
       rect:
         serializedVersion: 2
         x: 64
         y: 112
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8db32dd0781f3a64cad0b2acd1ac0ad2
-      internalID: 1497925198
+      spriteID: 64cd23eddc632be46834ec573763c337
+      internalID: 1970588190
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_45
+      name: Player_Jersey_45
       rect:
         serializedVersion: 2
         x: 0
         y: 96
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5c1a0a5ab10aba9438d8271f5301f0a7
-      internalID: -177794392
+      spriteID: a8339b026cdde5c4f9058a493d734b8d
+      internalID: 1958125372
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_46
+      name: Player_Jersey_46
       rect:
         serializedVersion: 2
         x: 16
         y: 96
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a7f7b632afacb4242b8ea3d759ea9cb1
-      internalID: 1612693575
+      spriteID: 976dc1fc5b98cda43855914dd70642f6
+      internalID: 1953692106
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_47
+      name: Player_Jersey_47
       rect:
         serializedVersion: 2
         x: 32
         y: 96
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 561de611c21d2204ea46fdbf7d57b68a
-      internalID: -1511592692
+      spriteID: b232f100b697f5a4ebba7ac25aa51f48
+      internalID: 1945078887
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_48
+      name: Player_Jersey_48
       rect:
         serializedVersion: 2
         x: 48
         y: 96
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3373e461d39689248abc852f6e5a6ef5
-      internalID: 133605604
+      spriteID: 283b8e8c8076c584788d1adf7a61a925
+      internalID: 1078461998
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_49
+      name: Player_Jersey_49
       rect:
         serializedVersion: 2
         x: 64
         y: 96
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6bd8168b6bb6cde42b2468a35d1ce5b6
-      internalID: 1194721863
+      spriteID: feade39953d351041832b6d37ed84df0
+      internalID: 1802882036
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_50
+      name: Player_Jersey_50
       rect:
         serializedVersion: 2
         x: 0
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6a689d58a448f86479cee782b6b86eae
-      internalID: 1306149516
+      spriteID: a1902ed8c7ae00046be36c085a1dc5dc
+      internalID: -804714811
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_51
+      name: Player_Jersey_51
       rect:
         serializedVersion: 2
         x: 16
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c68cc11a49f7bbc48b63a7b4122fe33e
-      internalID: -2132875119
+      spriteID: 116b2c7e15860154fb848c2540aefba5
+      internalID: 1642631747
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_52
+      name: Player_Jersey_52
       rect:
         serializedVersion: 2
         x: 32
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2fc6785ad7379144fa794049d8a6f953
-      internalID: 2118963481
+      spriteID: 286d439ed248d1746b4adbf323cbaf4d
+      internalID: -1628015637
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_53
+      name: Player_Jersey_53
       rect:
         serializedVersion: 2
         x: 48
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d791bcb733795c542bd4f15f3309b3eb
-      internalID: 581234211
+      spriteID: d9bb7bd898fe66f40b0c07954d2ac348
+      internalID: 986361172
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_54
+      name: Player_Jersey_54
       rect:
         serializedVersion: 2
         x: 64
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2026bc215e001af4f8b6ce5a113beeba
-      internalID: 2078931677
+      spriteID: 3c7de51fd0cbd88428c1291c3c244c01
+      internalID: 326460067
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_55
+      name: Player_Jersey_55
       rect:
         serializedVersion: 2
         x: 80
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 89a9244e34dc84442adba936a0f1c8ac
-      internalID: -1429355405
+      spriteID: 1f35ec7f915e65742b8377417d848193
+      internalID: -1050297479
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_56
+      name: Player_Jersey_56
       rect:
         serializedVersion: 2
         x: 96
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 83e874d216a7bbd49b4aca3e23aad87d
-      internalID: -396833634
+      spriteID: c0fa823c023b064478e32dcfb8376670
+      internalID: -1421465724
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_57
+      name: Player_Jersey_57
       rect:
         serializedVersion: 2
         x: 112
         y: 80
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 48be1c53a022c6347a909b9ad3a4dd53
-      internalID: -701025872
+      spriteID: 4ce8e7f570aa6cb4585ba9dc288a56fb
+      internalID: -647930456
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_58
+      name: Player_Jersey_58
       rect:
         serializedVersion: 2
         x: 0
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f5d0d2cd05b1df845a09797f813a0c0b
-      internalID: -2111994622
+      spriteID: bf0e81079bbe5364187832ab886d7b39
+      internalID: -1579924981
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_59
+      name: Player_Jersey_59
       rect:
         serializedVersion: 2
         x: 16
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f2106b1a5c5f70144b2f65096dc6bb44
-      internalID: 2817860
+      spriteID: bb56be638eeb103428b5d089f900c647
+      internalID: 562619146
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_60
+      name: Player_Jersey_60
       rect:
         serializedVersion: 2
         x: 32
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8d596c620dee5db4c805587157d965a5
-      internalID: -691034431
+      spriteID: 62e8e192c01d5dc43976fd8a4f8ce7b5
+      internalID: -1206702687
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_61
+      name: Player_Jersey_61
       rect:
         serializedVersion: 2
         x: 48
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8407610a62e349e4891544e63cb2378c
-      internalID: -501043691
+      spriteID: 1cb76231cf869444c8daa9761c0f11e1
+      internalID: -1796803972
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_62
+      name: Player_Jersey_62
       rect:
         serializedVersion: 2
         x: 64
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9704a64e472668144bb30cbef902549f
-      internalID: 920858762
+      spriteID: 3592f1539b034334ca185a56e6692743
+      internalID: -1083267780
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_63
+      name: Player_Jersey_63
       rect:
         serializedVersion: 2
         x: 80
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 61ef4f4ef0f588540ade97fbe6537ba8
-      internalID: -1703779017
+      spriteID: d0c0785adc36868498b28f37b3e229e6
+      internalID: -264180286
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_64
+      name: Player_Jersey_64
       rect:
         serializedVersion: 2
         x: 96
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 14e7da43408d27247bc11824056e1d0f
-      internalID: 195656266
+      spriteID: ad2b96ba075602247900d0395de7b23a
+      internalID: -1634137124
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_65
+      name: Player_Jersey_65
       rect:
         serializedVersion: 2
         x: 112
         y: 64
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e9050050571cd214dafe3d1223e125aa
-      internalID: -1170495872
+      spriteID: d49acfcd8a390df4bb81e7c7562bd5c7
+      internalID: -1791960805
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_66
+      name: Player_Jersey_66
       rect:
         serializedVersion: 2
         x: 0
         y: 48
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bdce500aa856489418920cf5a5e6856a
-      internalID: 786393482
+      spriteID: ea701c301fd573f4c9fd210524f9dfbf
+      internalID: -971083911
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_67
+      name: Player_Jersey_67
       rect:
         serializedVersion: 2
         x: 16
         y: 48
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6a9825df23850394b9523f4401fbcb7d
-      internalID: 1705778523
+      spriteID: 35467d658c547304dba4fb913c8cff93
+      internalID: -1559204043
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_68
+      name: Player_Jersey_68
       rect:
         serializedVersion: 2
         x: 0
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a618db014f26a754ea9fda4a86bbf2d4
-      internalID: 1556693784
+      spriteID: 39b69d92b4fddf94db07fabe760b6c9f
+      internalID: 1775232922
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_69
+      name: Player_Jersey_69
       rect:
         serializedVersion: 2
         x: 16
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b98b36a220fa1034580e4f752c90f791
-      internalID: -1018766514
+      spriteID: f1c40f5aaacf7104c9d0f4424882a240
+      internalID: -1582593503
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_70
+      name: Player_Jersey_70
       rect:
         serializedVersion: 2
         x: 32
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1a9a136c6cf137b4da266884af5728aa
-      internalID: 1488401312
+      spriteID: b9abba06ed9d5b44b8d561c4a3a92230
+      internalID: -2115879948
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_71
+      name: Player_Jersey_71
       rect:
         serializedVersion: 2
         x: 48
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2e2caec934cec3e4a9f3565a0fd3e0d4
-      internalID: 614068099
+      spriteID: 8b05242ff49e3f24a82c57c4ef9b8a6a
+      internalID: 355417555
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_72
+      name: Player_Jersey_72
       rect:
         serializedVersion: 2
         x: 64
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2a9662210371dba418b9cc77eaab4cdd
-      internalID: -350438647
+      spriteID: 586b8cb3a127c7b44b9837b64dc326c1
+      internalID: -2078472197
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_73
+      name: Player_Jersey_73
       rect:
         serializedVersion: 2
         x: 80
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 792e0082739c73b4fbc17a9b80a53451
-      internalID: 1866126655
+      spriteID: 7e3a59d2e3cd4124a8d5c8abb47c8203
+      internalID: -1748140540
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_74
+      name: Player_Jersey_74
       rect:
         serializedVersion: 2
         x: 96
         y: 32
         width: 16
         height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: df29450fe83fcd943973d4e26e439d48
-      internalID: 1574190462
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_75
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 16
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 90f08007d94106846b563e688bcae7db
-      internalID: 1657509214
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_76
-      rect:
-        serializedVersion: 2
-        x: 16
-        y: 16
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a7c1c7abe45a78b48b8d95b59d3b0fc5
-      internalID: -563601987
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_77
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 16
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bd6b82980120d594dace115c5d1ce30e
-      internalID: 1699234627
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_78
-      rect:
-        serializedVersion: 2
-        x: 48
-        y: 16
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a687c84b1e03edb429e69f3f26356a5e
-      internalID: -1819549997
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_79
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 16
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 640cfd131c967314fb0cb1758310c155
-      internalID: 1316773172
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_80
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5e8023a270358f14ab4c2c24a76e6fbd
-      internalID: -767121858
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_81
-      rect:
-        serializedVersion: 2
-        x: 16
-        y: 0
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ee3375220a45de744b2c23a37cb72109
-      internalID: 654963141
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_82
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 0
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f03bed87c8b9caf4b8a0a53a1691dcb1
-      internalID: 1327756169
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_83
-      rect:
-        serializedVersion: 2
-        x: 48
-        y: 0
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 64b58fdce03f8b340ad94a38c2f67b78
-      internalID: -349931636
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_16x16_Sheet_Red_A_84
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 16
-        height: 16
-      alignment: 1
-      pivot: {x: 0, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: af378e5eba018ef47b69b601547ddd57
-      internalID: -529251953
+      spriteID: 8fdd19883e33b164285fe56432b7248e
+      internalID: 1353938106
       vertices: []
       indices: 
       edges: []
@@ -1900,91 +1690,81 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Player_16x16_Sheet_Red_A_0: 1507293997
-      Player_16x16_Sheet_Red_A_1: 1620663328
-      Player_16x16_Sheet_Red_A_10: 1045888485
-      Player_16x16_Sheet_Red_A_11: -2082955861
-      Player_16x16_Sheet_Red_A_12: -2004701629
-      Player_16x16_Sheet_Red_A_13: -995735946
-      Player_16x16_Sheet_Red_A_14: 684377126
-      Player_16x16_Sheet_Red_A_15: 1152398923
-      Player_16x16_Sheet_Red_A_16: -1073272262
-      Player_16x16_Sheet_Red_A_17: 167110027
-      Player_16x16_Sheet_Red_A_18: -658286519
-      Player_16x16_Sheet_Red_A_19: -1604172281
-      Player_16x16_Sheet_Red_A_2: 199204359
-      Player_16x16_Sheet_Red_A_20: -1823276877
-      Player_16x16_Sheet_Red_A_21: 321450865
-      Player_16x16_Sheet_Red_A_22: -1969035651
-      Player_16x16_Sheet_Red_A_23: 559477630
-      Player_16x16_Sheet_Red_A_24: 434374841
-      Player_16x16_Sheet_Red_A_25: 1969197438
-      Player_16x16_Sheet_Red_A_26: 1975600825
-      Player_16x16_Sheet_Red_A_27: 61377962
-      Player_16x16_Sheet_Red_A_28: -275676415
-      Player_16x16_Sheet_Red_A_29: 1831681897
-      Player_16x16_Sheet_Red_A_3: 1576131735
-      Player_16x16_Sheet_Red_A_30: 598832358
-      Player_16x16_Sheet_Red_A_31: 636629708
-      Player_16x16_Sheet_Red_A_32: 1677697802
-      Player_16x16_Sheet_Red_A_33: -1385235611
-      Player_16x16_Sheet_Red_A_34: 914744016
-      Player_16x16_Sheet_Red_A_35: -242983313
-      Player_16x16_Sheet_Red_A_36: 804097532
-      Player_16x16_Sheet_Red_A_37: -1522027661
-      Player_16x16_Sheet_Red_A_38: -888489894
-      Player_16x16_Sheet_Red_A_39: 1901325989
-      Player_16x16_Sheet_Red_A_4: 1733344123
-      Player_16x16_Sheet_Red_A_40: 221497998
-      Player_16x16_Sheet_Red_A_41: 2124526212
-      Player_16x16_Sheet_Red_A_42: -1884860367
-      Player_16x16_Sheet_Red_A_43: 517081093
-      Player_16x16_Sheet_Red_A_44: 1497925198
-      Player_16x16_Sheet_Red_A_45: -177794392
-      Player_16x16_Sheet_Red_A_46: 1612693575
-      Player_16x16_Sheet_Red_A_47: -1511592692
-      Player_16x16_Sheet_Red_A_48: 133605604
-      Player_16x16_Sheet_Red_A_49: 1194721863
-      Player_16x16_Sheet_Red_A_5: -461107575
-      Player_16x16_Sheet_Red_A_50: 1306149516
-      Player_16x16_Sheet_Red_A_51: -2132875119
-      Player_16x16_Sheet_Red_A_52: 2118963481
-      Player_16x16_Sheet_Red_A_53: 581234211
-      Player_16x16_Sheet_Red_A_54: 2078931677
-      Player_16x16_Sheet_Red_A_55: -1429355405
-      Player_16x16_Sheet_Red_A_56: -396833634
-      Player_16x16_Sheet_Red_A_57: -701025872
-      Player_16x16_Sheet_Red_A_58: -2111994622
-      Player_16x16_Sheet_Red_A_59: 2817860
-      Player_16x16_Sheet_Red_A_6: 1792455330
-      Player_16x16_Sheet_Red_A_60: -691034431
-      Player_16x16_Sheet_Red_A_61: -501043691
-      Player_16x16_Sheet_Red_A_62: 920858762
-      Player_16x16_Sheet_Red_A_63: -1703779017
-      Player_16x16_Sheet_Red_A_64: 195656266
-      Player_16x16_Sheet_Red_A_65: -1170495872
-      Player_16x16_Sheet_Red_A_66: 786393482
-      Player_16x16_Sheet_Red_A_67: 1705778523
-      Player_16x16_Sheet_Red_A_68: 1556693784
-      Player_16x16_Sheet_Red_A_69: -1018766514
-      Player_16x16_Sheet_Red_A_7: -185683406
-      Player_16x16_Sheet_Red_A_70: 1488401312
-      Player_16x16_Sheet_Red_A_71: 614068099
-      Player_16x16_Sheet_Red_A_72: -350438647
-      Player_16x16_Sheet_Red_A_73: 1866126655
-      Player_16x16_Sheet_Red_A_74: 1574190462
-      Player_16x16_Sheet_Red_A_75: 1657509214
-      Player_16x16_Sheet_Red_A_76: -563601987
-      Player_16x16_Sheet_Red_A_77: 1699234627
-      Player_16x16_Sheet_Red_A_78: -1819549997
-      Player_16x16_Sheet_Red_A_79: 1316773172
-      Player_16x16_Sheet_Red_A_8: 48752561
-      Player_16x16_Sheet_Red_A_80: -767121858
-      Player_16x16_Sheet_Red_A_81: 654963141
-      Player_16x16_Sheet_Red_A_82: 1327756169
-      Player_16x16_Sheet_Red_A_83: -349931636
-      Player_16x16_Sheet_Red_A_84: -529251953
-      Player_16x16_Sheet_Red_A_9: 307240507
+      Player_Jersey_0: 129017810
+      Player_Jersey_1: 1907270013
+      Player_Jersey_10: -994717366
+      Player_Jersey_11: -989922882
+      Player_Jersey_12: 2043071291
+      Player_Jersey_13: -564771792
+      Player_Jersey_14: -1050694043
+      Player_Jersey_15: -998311826
+      Player_Jersey_16: 614738582
+      Player_Jersey_17: 523357375
+      Player_Jersey_18: 1230956942
+      Player_Jersey_19: 757178465
+      Player_Jersey_2: -2107861449
+      Player_Jersey_20: 1472483358
+      Player_Jersey_21: 1273156965
+      Player_Jersey_22: -397531717
+      Player_Jersey_23: -56969625
+      Player_Jersey_24: -1219686507
+      Player_Jersey_25: -701697555
+      Player_Jersey_26: -681338459
+      Player_Jersey_27: -741010217
+      Player_Jersey_28: -1074732449
+      Player_Jersey_29: 656683373
+      Player_Jersey_3: -716215631
+      Player_Jersey_30: -429600966
+      Player_Jersey_31: 1820921022
+      Player_Jersey_32: 718641094
+      Player_Jersey_33: 126789063
+      Player_Jersey_34: 381914639
+      Player_Jersey_35: -1536241002
+      Player_Jersey_36: -353579273
+      Player_Jersey_37: -1515597874
+      Player_Jersey_38: 1063484910
+      Player_Jersey_39: 51738631
+      Player_Jersey_4: -431724836
+      Player_Jersey_40: -1603053307
+      Player_Jersey_41: -1112308925
+      Player_Jersey_42: -151658588
+      Player_Jersey_43: -1840594275
+      Player_Jersey_44: 1970588190
+      Player_Jersey_45: 1958125372
+      Player_Jersey_46: 1953692106
+      Player_Jersey_47: 1945078887
+      Player_Jersey_48: 1078461998
+      Player_Jersey_49: 1802882036
+      Player_Jersey_5: 2004085204
+      Player_Jersey_50: -804714811
+      Player_Jersey_51: 1642631747
+      Player_Jersey_52: -1628015637
+      Player_Jersey_53: 986361172
+      Player_Jersey_54: 326460067
+      Player_Jersey_55: -1050297479
+      Player_Jersey_56: -1421465724
+      Player_Jersey_57: -647930456
+      Player_Jersey_58: -1579924981
+      Player_Jersey_59: 562619146
+      Player_Jersey_6: 693775255
+      Player_Jersey_60: -1206702687
+      Player_Jersey_61: -1796803972
+      Player_Jersey_62: -1083267780
+      Player_Jersey_63: -264180286
+      Player_Jersey_64: -1634137124
+      Player_Jersey_65: -1791960805
+      Player_Jersey_66: -971083911
+      Player_Jersey_67: -1559204043
+      Player_Jersey_68: 1775232922
+      Player_Jersey_69: -1582593503
+      Player_Jersey_7: -1424424230
+      Player_Jersey_70: -2115879948
+      Player_Jersey_71: 355417555
+      Player_Jersey_72: -2078472197
+      Player_Jersey_73: -1748140540
+      Player_Jersey_74: 1353938106
+      Player_Jersey_8: -1550326067
+      Player_Jersey_9: 526271172
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

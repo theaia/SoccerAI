@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
-  m_Name: pixelmix SDF
+  m_Name: pixelmix SDF - Outline
   m_EditorClassIdentifier: 
-  hashCode: -985751803
+  hashCode: -1479163832
   material: {fileID: 1185019986515085487}
-  materialHashCode: -2003026555
+  materialHashCode: -1886268568
   m_Version: 1.1.0
   m_SourceFontFileGUID: d039e024663786a4cbe505452db6daff
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: d039e024663786a4cbe505452db6daff, type: 3}
@@ -5018,7 +5018,7 @@ Material:
     - _ColorMask: 15
     - _CullMode: 0
     - _Diffuse: 0.5
-    - _FaceDilate: 0
+    - _FaceDilate: 0.5
     - _FaceUVSpeedX: 0
     - _FaceUVSpeedY: 0
     - _GlowInner: 0.012
@@ -5032,12 +5032,12 @@ Material:
     - _OutlineSoftness: 0
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
-    - _OutlineWidth: 0
+    - _OutlineWidth: 0.2
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.8333333
-    - _ScaleRatioB: 0.6770833
-    - _ScaleRatioC: 0.6770833
+    - _ScaleRatioB: 0.26041666
+    - _ScaleRatioC: 0.20345053
     - _ScaleX: 1
     - _ScaleY: 1
     - _ShaderFlags: 0
@@ -5050,10 +5050,10 @@ Material:
     - _StencilWriteMask: 255
     - _TextureHeight: 512
     - _TextureWidth: 512
-    - _UnderlayDilate: -0.33
+    - _UnderlayDilate: 0.291
     - _UnderlayOffsetX: 0
     - _UnderlayOffsetY: 0
-    - _UnderlaySoftness: 1
+    - _UnderlaySoftness: 0.989
     - _VertexOffsetX: 0
     - _VertexOffsetY: 0
     - _WeightBold: 0.75
@@ -5068,7 +5068,7 @@ Material:
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
-    - _UnderlayColor: {r: 1, g: 1, b: 1, a: 0.5}
+    - _UnderlayColor: {r: 3.482202, g: 3.482202, b: 3.482202, a: 0.5}
   m_BuildTextureStacks: []
 --- !u!28 &5063749439508875970
 Texture2D:

@@ -9,7 +9,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5439998628514048567, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
       propertyPath: m_Name
-      value: PlayerCPU-AIAPrototype
+      value: Player-AIA
       objectReference: {fileID: 0}
     - target: {fileID: 5439998628514048704, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
       propertyPath: m_RootOrder
@@ -54,6 +54,10 @@ PrefabInstance:
     - target: {fileID: 5439998628514048704, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5439998628514048719, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
+      propertyPath: country
+      value: 26
       objectReference: {fileID: 0}
     - target: {fileID: 5461231748367251779, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
       propertyPath: detailedGizmos

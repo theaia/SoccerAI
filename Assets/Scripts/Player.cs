@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum Role {
@@ -17,19 +18,19 @@ public class Player : MonoBehaviour
         Ability = false
     };
     private KeyboardInput[] m_Inputs;
-    private AnimController animController;
+    private List<AnimController> animController = new List<AnimController>();
 
     private Rigidbody2D rb;
     private bool hasBall;
     private float stamina;
-    [SerializeField] private float speed = 1f;
+    private float speed = 1f;
     private float shotChargeTime;
     private bool isBallNearby;
     private string lastCollidedObjectTagged;
     private Vector2 formationLocation;
 
-
-    [SerializeField] private Team team;
+	[SerializeField] private Country country;
+	[SerializeField] private Team team;
     [SerializeField] private Role role;
 
     private PlayerAgent agent;
@@ -56,6 +57,10 @@ public class Player : MonoBehaviour
         return speed;
 	}
 
+    public Country GetCountry() {
+        return country;
+    }
+
     public bool GetIsBallNearby() {
         return isBallNearby;
     }
@@ -81,8 +86,8 @@ public class Player : MonoBehaviour
         SetHasBall(false);
     }
 
-    public void SetAnimController(AnimController _animController) {
-        animController = _animController;
+    public void AddAnimController(AnimController _animController) {
+        animController.Add(_animController);
     }
 
     public float GetDistanceToBall() {
@@ -107,11 +112,6 @@ public class Player : MonoBehaviour
     public void SetTeam(Team _team) {
         team = _team;
         gameObject.tag = team == Team.Home ? "home" : "away";
-        Instantiate(GameManager.Instance.GetRandomTeamPrefab(_team), transform);
-        if (animController != null) {
-            Destroy(animController.gameObject);
-        }
-        animController = GetComponentInChildren<AnimController>();
     }
 
     public string[] GetLocalPerception() {
@@ -335,7 +335,7 @@ public class Player : MonoBehaviour
 	}
     
     private Vector2 GetDirection() {
-        State _currentState = animController.GetAnimState();
+        State _currentState = animController[0].GetAnimState();
         Vector2 direction;
 		switch (_currentState) {
             default:
@@ -399,66 +399,20 @@ public class Player : MonoBehaviour
 	}
 
     private void Animate(bool _cheering = false) {
+        State _currentState;
 		if (_cheering) {
-            animController.SetAnimState(State.cheer);
-            return;
+			_currentState = State.cheer;
+		} else if (!GameManager.Instance.GetCanMove()) {
+			_currentState = State.idle;
+		} else {
+			_currentState = Utils.GetState(inputData.Move);
+            if (hasBall) {
+                targetBallPosition = Utils.GetTargetBallPosFromState(_currentState);
+            }
 		}
 
-        if (!GameManager.Instance.GetCanMove()) {
-            animController.SetAnimState(State.idle);
-            return;
-        }
-
-        if (inputData.Move.x == 0 && inputData.Move.y > 0) {
-            animController.SetAnimState(State.up);
-            if (hasBall) {
-                targetBallPosition = new Vector2(0f, 0.06f);
-            }
-
-        } else if(inputData.Move.x > 0 && inputData.Move.y > 0) {
-            animController.SetAnimState(State.rightup);
-            if (hasBall) {
-                targetBallPosition = new Vector2(0.04f, 0.04f);
-            }
-
-        } else if (inputData.Move.x > 0 && inputData.Move.y == 0) {
-            animController.SetAnimState(State.right);
-            if (hasBall) {
-                targetBallPosition = new Vector2(0.06f, 0f);
-            }
-
-        } else if (inputData.Move.x > 0 && inputData.Move.y < 0) {
-            animController.SetAnimState(State.rightdown);
-            if (hasBall) {
-                targetBallPosition = new Vector2(0.04f, -0.04f);
-            }
-
-        } else if (inputData.Move.x == 0 && inputData.Move.y < 0) {
-            animController.SetAnimState(State.down);
-            if (hasBall) {
-                targetBallPosition = new Vector2(0f, -0.06f);
-            }
-
-        } else if (inputData.Move.x < 0 && inputData.Move.y < 0) {
-            animController.SetAnimState(State.leftdown);
-            if (hasBall) {
-                targetBallPosition = new Vector2(-0.04f, -0.04f);
-            }
-
-        } else if (inputData.Move.x < 0 && inputData.Move.y == 0) {
-            animController.SetAnimState(State.left);
-            if (hasBall) {
-                targetBallPosition = new Vector2(-0.06f, 0f);
-            }
-
-        } else if (inputData.Move.x < 0 && inputData.Move.y > 0) {
-            animController.SetAnimState(State.leftup);
-            if (hasBall) {
-                targetBallPosition = new Vector2(-0.04f, 0.04f);
-            }
-
-        } else {
-            animController.SetAnimState(State.idle);
+		foreach (AnimController _anim in animController) {
+			_anim.SetAnimState(_currentState);
         }
     }
 

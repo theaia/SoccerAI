@@ -489,7 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd26575ef09c75143acec6f70e7cc9f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGameState: 6
+  currentGameState: 2
   homePrefab: {fileID: 9078275708586084584, guid: dcbafbede0ff2be408f9d268fbbf34dc, type: 3}
   awayPrefab: {fileID: 9078275708586084584, guid: dcbafbede0ff2be408f9d268fbbf34dc, type: 3}
   homeFormationPrefab: {fileID: 675884908639035132, guid: 52f721950d057364088cb5989691caf8, type: 3}
@@ -497,23 +497,28 @@ MonoBehaviour:
   homeScoreText: {fileID: 745946609}
   awayScoreText: {fileID: 1743859379}
   timerText: {fileID: 93050186}
+  homeAbrvText: {fileID: 1109138040}
+  awayAbrvText: {fileID: 470395523}
+  homeFlag: {fileID: 1030875071}
+  awayFlag: {fileID: 1787786041}
+  skins:
+  - {fileID: 385639546985922219, guid: ab02ee90b1b46a943b1d833d57da1f40, type: 3}
+  - {fileID: 385639546985922219, guid: 8822b31b85653de44acf286b4662457f, type: 3}
+  - {fileID: 385639546985922219, guid: 778e25a18eae7bf4e9d41ce7704a027f, type: 3}
+  - {fileID: 385639546985922219, guid: 1099c9a5af9fda64da1a373cb40bbaf1, type: 3}
   DirectionLayersToCheck:
     serializedVersion: 2
     m_Bits: 1728
-  HomeCharacterSprites:
-  - {fileID: 385639546985922219, guid: 591f68d606eb62544b9e4a8b9a31c09b, type: 3}
-  AwayCharacterSprites:
-  - {fileID: 385639546985922219, guid: f4c5b4ca4bfbd7f47a275764701f9841, type: 3}
-  ball: {fileID: 2053401730}
   ArenaWidth: {x: -1.49, y: 1.49}
   ArenaHeight: {x: -1.14, y: 1.14}
   TimeScale: 1
+  ball: {fileID: 2053401730}
   ballSimulationTime: 1
   numPoints: 100
   pointSpacing: 0.1
-  collisionLayer:
+  ballSimCollisionLayers:
     serializedVersion: 2
-    m_Bits: 1729
+    m_Bits: 1216
   lineDuration: 0.1
 --- !u!4 &190385733
 Transform:
@@ -627,7 +632,7 @@ GameObject:
   - component: {fileID: 470395524}
   - component: {fileID: 470395523}
   m_Layer: 5
-  m_Name: BLUE
+  m_Name: AWAY
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -675,8 +680,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: BLU
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 21065344f4fa9f44898a19823ad1f377, type: 2}
-  m_sharedMaterial: {fileID: 1185019986515085487, guid: 21065344f4fa9f44898a19823ad1f377, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f219cc8eace39974bb6e6f83ef5b3a7c, type: 2}
+  m_sharedMaterial: {fileID: 1185019986515085487, guid: f219cc8eace39974bb6e6f83ef5b3a7c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1277,7 +1282,7 @@ GameObject:
   - component: {fileID: 1030875072}
   - component: {fileID: 1030875071}
   m_Layer: 5
-  m_Name: HomeImg
+  m_Name: HomeFlag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1300,8 +1305,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -64, y: -4.5}
-  m_SizeDelta: {x: 25, y: 25}
+  m_AnchoredPosition: {x: -64, y: -5}
+  m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1030875071
 MonoBehaviour:
@@ -1316,15 +1321,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.92549026, g: 0.19215688, b: 0.19215688, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -1945905503, guid: f1387c09a73b72145b0cc0b4921c72a8, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1401,8 +1406,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: RED
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 21065344f4fa9f44898a19823ad1f377, type: 2}
-  m_sharedMaterial: {fileID: 1185019986515085487, guid: 21065344f4fa9f44898a19823ad1f377, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f219cc8eace39974bb6e6f83ef5b3a7c, type: 2}
+  m_sharedMaterial: {fileID: 1185019986515085487, guid: f219cc8eace39974bb6e6f83ef5b3a7c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1808,7 +1813,7 @@ GameObject:
   - component: {fileID: 1787786042}
   - component: {fileID: 1787786041}
   m_Layer: 5
-  m_Name: AwayImg
+  m_Name: AwayFlag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1832,7 +1837,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 64, y: -4.5}
-  m_SizeDelta: {x: 25, y: 25}
+  m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1787786041
 MonoBehaviour:
@@ -1847,15 +1852,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19215688, g: 0.56078434, b: 0.92549026, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -301721963, guid: f1387c09a73b72145b0cc0b4921c72a8, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4

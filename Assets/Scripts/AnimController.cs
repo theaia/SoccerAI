@@ -38,7 +38,7 @@ public class AnimController : MonoBehaviour
 	}
 	private void Start() {
         spriteRenderer.sprite = idle[0];
-        GetComponentInParent<Player>().SetAnimController(this);
+        GetComponentInParent<Player>().AddAnimController(this);
 	}
 
     public State GetAnimState() {
