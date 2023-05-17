@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void SetCountryInfo(Team _team, CountryInfo _countryInfo) {
-		Debug.Log($"Setting country info for {_team} to {_countryInfo.name}");
+		Debug.Log($"Setting country info for {_team} to {_countryInfo}");
 		if(_countryInfo == null) {
 			return;
 		}
