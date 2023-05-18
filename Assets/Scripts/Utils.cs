@@ -399,7 +399,8 @@ public static class Utils{
 	}
 
     public static bool RandomBool() {
-        return Random.value > 0.5f;
+		System.Random rand = new System.Random();
+		return rand.Next(2) == 0;
     }
 
     public static Vector2 ClampedArenaPos(Vector2 _value, float _sideMargins = 0, float _topMargins = 0) {

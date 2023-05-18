@@ -734,11 +734,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 6abecde8-0906-44ad-98de-4f9879d8da74
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Pixel Premier League
+  organizationId: unicorn-one
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
