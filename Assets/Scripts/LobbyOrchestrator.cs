@@ -8,6 +8,7 @@ using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Player = Unity.Services.Lobbies.Models.Player;
 
 public class LobbyOrchestrator : NetworkBehaviour {
 	[SerializeField] TMP_InputField joinInputCode;
@@ -17,6 +18,7 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	[SerializeField] GameObject roomScreen;
 
 	private string playerName;
+	private string currentLobbyId;
 	
 	private void Start() {
 		playerName = "AIA" + UnityEngine.Random.Range(10, 99);
@@ -39,11 +41,17 @@ public class LobbyOrchestrator : NetworkBehaviour {
 			try {
 				//await MatchmakingService.CreateLobbyWithAllocation(data);
 				//var lobbyIds = await LobbyService.Instance.GetJoinedLobbiesAsync();
+				CreateLobbyOptions _options = new CreateLobbyOptions {
+					Player = GetThisPlayer()
+				};
 
 				Lobby _lobby = await LobbyService.Instance.CreateLobbyAsync(data.Name, data.MaxPlayers);
 				
 				createScreen.gameObject.SetActive(false);
 				roomScreen.gameObject.SetActive(true);
+
+				currentLobbyId = _lobby.Id;
+				
 				UpdateLobbyCode(_lobby.LobbyCode);
 				// Starting the host immediately will keep the relay server alive
 				NetworkManager.Singleton.StartHost();
@@ -61,11 +69,19 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	public async void JoinLobby() {
 		using (new Load("Join Lobby...")) {
 			try {
-				Lobby _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinInputCode.text);
+				
+				JoinLobbyByCodeOptions _options = new JoinLobbyByCodeOptions {
+					Player = GetThisPlayer()
+				};
+				
+				Lobby _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinInputCode.text, _options);
 				//await MatchmakingService.JoinLobbyWithAllocation(_lobby.Id);
 
 				createScreen.gameObject.SetActive(false);
 				roomScreen.gameObject.SetActive(true);
+				
+				currentLobbyId = _lobby.Id;
+				
 				UpdateLobbyCode(_lobby.LobbyCode);
 				// Starting the host immediately will keep the relay server alive
 				NetworkManager.Singleton.StartClient();
@@ -165,7 +181,8 @@ public class LobbyOrchestrator : NetworkBehaviour {
 		using (new Load("Leaving Lobby...")) {
 			_playersInLobby.Clear();
 			NetworkManager.Singleton.Shutdown();
-			await MatchmakingService.LeaveLobby();
+			//await MatchmakingService.LeaveLobby();
+			await LobbyService.Instance.RemovePlayerAsync(currentLobbyId, AuthenticationService.Instance.PlayerId);
 			UpdateLobbyCode();
 			roomScreen.gameObject.SetActive(false);
 			createScreen.gameObject.SetActive(true);
@@ -216,5 +233,25 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	
 	public void PasteClipboardToInput() {
 		joinInputCode.text = GUIUtility.systemCopyBuffer;
+	}
+
+	private Unity.Services.Lobbies.Models.Player GetThisPlayer() {
+		return new Unity.Services.Lobbies.Models.Player {
+			Data = new Dictionary<string, PlayerDataObject>() {
+				{ "PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, GetRawUsername()) },
+				{ "IsReady", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "false") },
+				{ "Team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "Home") },
+			}
+		};
+	}
+
+	private string GetRawUsername() {
+		string _username = AuthenticationService.Instance.PlayerName;
+		int hashIndex = _username.IndexOf('#');
+		if (hashIndex != -1) {
+			_username = _username.Substring(0, hashIndex);
+		}
+		_username = _username.Substring(0, Mathf.Min(_username.Length, 11));
+		return _username;
 	}
 }
