@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 450d3c85462b25943b754f98643f99cc, type: 3}
   m_Name: Armenia
   m_EditorClassIdentifier: 
-  Country: 0
+  Country: 2
   Abbreviation: ARM
   Flag: {fileID: -1807985310, guid: f1387c09a73b72145b0cc0b4921c72a8, type: 3}
   HomeJerseyColor: {r: 0.6666667, g: 0.09019608, b: 0.14509805, a: 1}

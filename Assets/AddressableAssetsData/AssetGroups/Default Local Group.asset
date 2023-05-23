@@ -21,6 +21,54 @@ MonoBehaviour:
     m_Address: CanvasUtilities
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: ab02ee90b1b46a943b1d833d57da1f40
+    m_Address: 0
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8822b31b85653de44acf286b4662457f
+    m_Address: 1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 778e25a18eae7bf4e9d41ce7704a027f
+    m_Address: 2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1099c9a5af9fda64da1a373cb40bbaf1
+    m_Address: 3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a82d11f2e5322f445ba0151235b67cde
+    m_Address: Away
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 415f12a149c7601408cf2df5307b2bbd
+    m_Address: Home
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d743f41837f37bb4aa0792846e2e1d4c
+    m_Address: USA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4432277a795076048aecdeaa959861ed
+    m_Address: Switzerland
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b9f0c8afde28ae849a8ac47383ed68e3
+    m_Address: Netherlands
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d7c0da3935664ba4782f2ea3f490b42b
+    m_Address: Canada
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4d9c0efc75b56204aa4c28b51be8283d
+    m_Address: Australia
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e77b35d8e279f364c8ec8aac26b978e3
+    m_Address: Armenia
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 91cf6397344e07846a1f4a06d3dde6b3, type: 2}
   m_SchemaSet:

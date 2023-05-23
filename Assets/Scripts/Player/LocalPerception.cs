@@ -17,6 +17,9 @@ public class LocalPerception : MonoBehaviour {
 	}
 
 	private void FixedUpdate() {
+		if (!GameManager.Instance) {
+			return;
+		}
 		string[] _newCollisionInfo = new string[8];
 		for (int i = 0; i < _newCollisionInfo.Length; i++) {
 			Vector2 _input = Utils.IntDirToInput(i);

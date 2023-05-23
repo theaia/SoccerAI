@@ -12,7 +12,8 @@ using UnityEngine;
 /// </summary>
 public class RoomScreen : MonoBehaviour {
     [SerializeField] private LobbyPlayerPanel _playerPanelPrefab;
-    [SerializeField] private Transform _playerPanelParent;
+    [SerializeField] private Transform _homePlayerPanelParent;
+    [SerializeField] private Transform _awayPlayerPanelParent;
     [SerializeField] private TMP_Text _waitingText;
     [SerializeField] private GameObject _startButton, _readyButton;
 
@@ -23,13 +24,13 @@ public class RoomScreen : MonoBehaviour {
     public static event Action StartPressed; 
 
     private void OnEnable() {
-        foreach (Transform child in _playerPanelParent) Destroy(child.gameObject);
+        foreach (Transform _child in _homePlayerPanelParent) Destroy(_child.gameObject);
+        foreach (Transform _child in _awayPlayerPanelParent) Destroy(_child.gameObject);
         _playerPanels.Clear();
 
         LobbyOrchestrator.LobbyPlayersUpdated += NetworkLobbyPlayersUpdated;
         MatchmakingService.CurrentLobbyRefreshed += OnCurrentLobbyRefreshed;
         _startButton.SetActive(false);
-        _readyButton.SetActive(false);
 
         _ready = false;
     }
@@ -45,7 +46,7 @@ public class RoomScreen : MonoBehaviour {
         LobbyLeft?.Invoke();
     }
 
-    private void NetworkLobbyPlayersUpdated(Dictionary<ulong, bool> players) {
+    private void NetworkLobbyPlayersUpdated(Dictionary<ulong, LobbyOrchestrator.PlayerLobbyNetworkData> players) {
         var allActivePlayerIds = players.Keys;
 
         // Remove all inactive panels
@@ -58,17 +59,19 @@ public class RoomScreen : MonoBehaviour {
         foreach (var player in players) {
             var currentPanel = _playerPanels.FirstOrDefault(p => p.PlayerId == player.Key);
             if (currentPanel != null) {
-                if (player.Value) currentPanel.SetReady();
+                //Debug.Log($"Updating Player {player.Key} panel because it's not null");
+                currentPanel.SetReady(player.Value.IsReady);
+                currentPanel.SetName(player.Value.PlayerName);
             }
             else {
-                var panel = Instantiate(_playerPanelPrefab, _playerPanelParent);
-                panel.Init(player.Key);
+                //Debug.Log($"Creating new Player {player.Key} panel because it is null");
+                var panel = Instantiate(_playerPanelPrefab, player.Value.Team == 1 ? _homePlayerPanelParent : _awayPlayerPanelParent);
+                panel.Init(player.Key, player.Value);
                 _playerPanels.Add(panel);
             }
         }
 
-        _startButton.SetActive(NetworkManager.Singleton.IsHost && players.All(p => p.Value));
-        _readyButton.SetActive(!_ready);
+        _startButton.SetActive(NetworkManager.Singleton.IsHost && players.All(p => p.Value.IsReady));
     }
 
     private void OnCurrentLobbyRefreshed(Lobby lobby) {
@@ -76,8 +79,8 @@ public class RoomScreen : MonoBehaviour {
     }
 
     public void OnReadyClicked() {
-        _readyButton.SetActive(false);
-        _ready = true;
+        /*_ready = !_ready;
+        _readyButton.SetActive(_ready);*/
     }
 
     public void OnStartClicked() {

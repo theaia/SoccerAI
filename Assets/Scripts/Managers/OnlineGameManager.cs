@@ -1,31 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
-public enum GameMode{
-	OnlineVS,
-	SinglePlayer,
-	OnlineSimulation
-}
-public enum GameState{
-	Paused,
-	Playing,
-	Kickoff,
-	Goal,
-	End,
-	Overtime,
-	Training,
-	Whistle
-}
-public class GameManager : NetworkBehaviour {
-	public static GameManager Instance;
+public class OnlineGameManager : NetworkBehaviour {
+	public static OnlineGameManager Instance;
 	[SerializeField] private GameMode currentGameMode;
 	[SerializeField] private GameState currentGameState;
 
@@ -97,10 +79,7 @@ public class GameManager : NetworkBehaviour {
 	private Player homePlayerNearestBall, awayPlayerNearestBall, playerNearestBall;
 	private bool isTraining;
 
-	private string homeCosmetics = "Home";
-	private string awayCosmetics = "Away";
-
-	private Dictionary<ulong, Player> networkedPlayerList = new Dictionary<ulong, Player>();
+	private CountryInfo homeCountryInfo, awayCountryInfo;
 
 	private List<Collider2D> projectedBallCollisionObjects = new List<Collider2D>();
 	private void Awake() {
@@ -112,81 +91,23 @@ public class GameManager : NetworkBehaviour {
 	}
 	
 	public override void OnNetworkSpawn() {
-		Debug.Log($"Spawning player for {NetworkManager.Singleton.LocalClientId}");
         SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
 	}   
 
     [ServerRpc(RequireOwnership = false)]
     private void SpawnPlayerServerRpc(ulong _playerId) {
-	    
 	    if (LobbyOrchestrator.PlayersInLobby[_playerId].Team == 0) {
-		    return; //Is Spectator
-	    }
-	    
-	    var _spawn = Instantiate(onlinePlayerPrefab);
-	    _spawn.NetworkObject.SpawnWithOwnership(_playerId);
-	    if (!networkedPlayerList.ContainsKey(_playerId)) {
-		    networkedPlayerList.Add(_playerId, _spawn);
-	    }
-	    
-	    
-	    if (!IsServer) {
+		    //Is Spectator
 		    return;
 	    }
-	    
+	    var _spawn = Instantiate(onlinePlayerPrefab);
 	    Team _team = LobbyOrchestrator.PlayersInLobby[_playerId].Team == 1 ? Team.Home : Team.Away;
 	    _spawn.SetTeam(_team);
+	    AddPlayer(_team, _spawn);
 	    _spawn.SetRole(Role.Human);
-	    int _teamInt = Utils.GetEnumIndex(_team);
-	    string _cosmeticId = _team == Team.Home ? homeCosmetics : awayCosmetics;
-	    _spawn.SetCosmetics(GetRandomSkinValue().ToString(), _cosmeticId, _teamInt);
-
-	    PropogateToClients(_playerId, _team);
+        _spawn.NetworkObject.SpawnWithOwnership(_playerId);
     }
 
-    private void Start() {
-	    SetCountryInfo(Team.Home, homeCosmetics);
-	    SetCountryInfo(Team.Away, awayCosmetics);
-    }
-
-    private void PropogateToClients(ulong _playerId, Team _team){
-	    foreach(var _player in networkedPlayerList.Values) {
-		    UpdatePlayerClientRpc(_player.OwnerClientId, _player.GetSkin(), _player.GetTeam() == Team.Home ? homeCosmetics : awayCosmetics, Utils.GetEnumIndex(_player.GetTeam()));
-	    }
-    }
-	
-    [ClientRpc]
-    private void UpdatePlayerClientRpc(ulong _playerId, string _skinId, string _country, int _teamInt ) {
-	    if (IsServer) return;
-	    Team _team = Utils.GetEnumValueByIndex<Team>(_teamInt);
-	    Player _player = GetOrAddPlayerByID(_playerId, _team);
-	    _player.SetTeam(_team);
-	    _player.SetCosmetics(_skinId, _country, _teamInt);
-    }
-
-    private Player GetOrAddPlayerByID(ulong _playerId, Team _team) {
-	    foreach (var _player in allPlayers) {
-		    if(_player.OwnerClientId == _playerId) {
-			    return _player;
-		    }
-	    }
-	    
-	    Player[] _players = FindObjectsOfType<Player>();
-	    
-	    allPlayers.Clear();
-	    homePlayers.Clear();
-	    awayPlayers.Clear();
-
-	    foreach (var _player in _players) {
-		    AddPlayer(_team, _player);
-		    if (_player.OwnerClientId == _playerId) {
-			    return _player;
-		    }
-	    }
-
-	    return null;
-    }
-    
     public override void OnDestroy() {
         base.OnDestroy();
         MatchmakingService.LeaveLobby();
@@ -198,27 +119,32 @@ public class GameManager : NetworkBehaviour {
 		Time.timeScale = TimeScale;
 	}
 
-	public async Task SetCountryInfo(Team _team, string _countryId) {
-		var _handleCountry = Addressables.LoadAssetAsync<CountryInfo>(_countryId);
-		await _handleCountry.Task;
-		if (_handleCountry.Status == AsyncOperationStatus.Succeeded) {
-			CountryInfo _countryInfo = _handleCountry.Result;
-			if(_team == Team.Home) {
-				var homeCountryInfo = _countryInfo;
-				homeAbrvText.text = homeCountryInfo.Abbreviation;
-				homeAbrvText.color = homeCountryInfo.HomeJerseyColor;
-				homeFlag.sprite = homeCountryInfo.Flag;
-			} else {
-				var awayCountryInfo = _countryInfo;
-				awayAbrvText.text = awayCountryInfo.Abbreviation;
-				awayAbrvText.color = awayCountryInfo.AwayJerseyColor;
-				awayFlag.sprite = awayCountryInfo.Flag;
-			}
+	public CountryInfo GetCountryInfo(Team _team) {
+		return _team == Team.Home ? homeCountryInfo : awayCountryInfo;
+	}
+
+	public void SetCountryInfo(Team _team, CountryInfo _countryInfo) {
+		Debug.Log($"Setting country info for {_team} to {_countryInfo}");
+		if(_countryInfo == null) {
+			return;
+		}
+
+		if(_team == Team.Home) {
+			homeCountryInfo = _countryInfo;
+			homeAbrvText.text = homeCountryInfo.Abbreviation;
+			homeAbrvText.color = homeCountryInfo.HomeJerseyColor;
+			homeFlag.sprite = homeCountryInfo.Flag;
+		} else {
+			awayCountryInfo = _countryInfo;
+			awayAbrvText.text = awayCountryInfo.Abbreviation;
+			awayAbrvText.color = awayCountryInfo.AwayJerseyColor;
+			awayFlag.sprite = awayCountryInfo.Flag;
 		}
 	}
 
 	private void OnEnable() {
-		if (!IsServer) {
+		if (!IsHost && !IsServer) {
+			Debug.Log($"Returning because not host or server. Host: {IsHost} Server: {IsServer} Client: {IsClient} Owner: {IsOwner} Local: {IsLocalPlayer} ");
 			return;
 		}
 		
@@ -256,8 +182,8 @@ public class GameManager : NetworkBehaviour {
 			UpdatePlayersNearestBall();
 		}
 	}
-	public int GetRandomSkinValue() {
-		return UnityEngine.Random.Range(0, skins.Length);
+	public GameObject GetRandomSkin() {
+		return skins[UnityEngine.Random.Range(0, skins.Length)];
 	}
 	public Team GetLastScoringTeam() {
 		return lastScoringTeam;

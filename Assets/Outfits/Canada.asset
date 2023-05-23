@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 450d3c85462b25943b754f98643f99cc, type: 3}
   m_Name: Canada
   m_EditorClassIdentifier: 
-  Country: 2
+  Country: 4
   Abbreviation: CDN
   Flag: {fileID: 349491202, guid: f1387c09a73b72145b0cc0b4921c72a8, type: 3}
   HomeJerseyColor: {r: 0.9843138, g: 0.23137257, b: 0.18823531, a: 1}

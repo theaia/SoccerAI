@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public static class Utils{
     public static Vector2 V2CenterPoint(this Vector2 v1, Vector2 v2) {
@@ -11,7 +13,7 @@ public static class Utils{
         return new Vector2((v1.x + v2.x + v3.x) / 3f, (v1.y + v2.y + v3.y) / 3f);
     }
 
-    public static Vector2 DirToClosestInput(Vector2 _dir) {
+    public static Vector2 V2ToClosestInput(Vector2 _dir) {
         Vector2 normalizedDirection = _dir.normalized; //Make sure the direction is normalized
         Vector2 closestDirection = Vector2.zero;
 
@@ -492,6 +494,28 @@ public static class Utils{
                 return new Vector2(0f, 0f);
         }
 	}
+    
+    public static int GetEnumIndex<T>(T _enumValue) where T : System.Enum
+    {
+        return System.Array.IndexOf(System.Enum.GetValues(typeof(T)), _enumValue);
+    }
+    
+    public static T GetEnumValueByIndex<T>(int _index) where T : struct, System.Enum
+    {
+        if (!typeof(T).IsEnum)
+        {
+            throw new ArgumentException("T must be an enum type");
+        }
+
+        T[] values = (T[])System.Enum.GetValues(typeof(T));
+
+        if (_index < 0 || _index >= values.Length)
+        {
+            throw new ArgumentOutOfRangeException("index", "Index is out of range for the enum type");
+        }
+
+        return values[_index];
+    }
 }
 
 public enum DirectionType {
@@ -503,3 +527,5 @@ public enum DirectionType {
     BackwardPreferred,
     All
 }
+
+

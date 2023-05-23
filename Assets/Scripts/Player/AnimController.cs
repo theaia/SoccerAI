@@ -38,7 +38,7 @@ public class AnimController : MonoBehaviour
 	}
 	private void Start() {
         spriteRenderer.sprite = idle[0];
-        GetComponentInParent<Player>().AddAnimController(this);
+        transform.parent.parent.GetComponent<Player>().AddAnimController(this);
 	}
 
     public State GetAnimState() {
@@ -46,6 +46,9 @@ public class AnimController : MonoBehaviour
 	}
 
 	private void Update() {
+        if (!GameManager.Instance) {
+            return;
+        }
         currentFrame++;
         if (currentFrame >= GameManager.Instance.animFrameRate && activeAnim != null) {
             currentAnimFrame = currentAnimFrame == activeAnim.Count - 1 ? 0 : currentAnimFrame + 1;

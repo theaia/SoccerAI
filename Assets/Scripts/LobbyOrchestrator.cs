@@ -1,14 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.Services.Relay;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using Player = Unity.Services.Lobbies.Models.Player;
+using Random = UnityEngine.Random;
 
 public class LobbyOrchestrator : NetworkBehaviour {
 	[SerializeField] TMP_InputField joinInputCode;
@@ -16,14 +18,19 @@ public class LobbyOrchestrator : NetworkBehaviour {
 
 	[SerializeField] GameObject createScreen;
 	[SerializeField] GameObject roomScreen;
-
-	private string playerName;
-	private string currentLobbyId;
 	
+	private string currentLobbyId;
+	[SerializeField] private bool serverAuth;
+	private PlayerLobbyNetworkData playerData;
+
+	private void Awake() {
+		playerData = new PlayerLobbyNetworkData(){};
+	}
+
 	private void Start() {
-		playerName = "AIA" + UnityEngine.Random.Range(10, 99);
-		UpdatePlayerName(playerName);
-		
+		UpdatePlayerName("AIA" + Random.Range(0,99));
+
+
 		createScreen.SetActive(true);
 		roomScreen.SetActive(false);
 
@@ -31,21 +38,19 @@ public class LobbyOrchestrator : NetworkBehaviour {
 		RoomScreen.LobbyLeft += OnLobbyLeft;
 		RoomScreen.StartPressed += OnGameStart;
 
-		NetworkObject.DestroyWithScene = true;
+		NetworkObject.DestroyWithScene = false;
 	}
 
 	#region Create
 
-	private async void CreateLobby(LobbyData data) {
+	private async void CreateLobby(LobbyData _data) {
 		using (new Load("Creating Lobby...")) {
 			try {
-				//await MatchmakingService.CreateLobbyWithAllocation(data);
-				//var lobbyIds = await LobbyService.Instance.GetJoinedLobbiesAsync();
-				CreateLobbyOptions _options = new CreateLobbyOptions {
+				/*CreateLobbyOptions _options = new CreateLobbyOptions {
 					Player = GetThisPlayer()
-				};
+				};*/
 
-				Lobby _lobby = await LobbyService.Instance.CreateLobbyAsync(data.Name, data.MaxPlayers);
+				Lobby _lobby = await LobbyService.Instance.CreateLobbyAsync(_data.Name, _data.MaxPlayers);
 				
 				createScreen.gameObject.SetActive(false);
 				roomScreen.gameObject.SetActive(true);
@@ -70,11 +75,11 @@ public class LobbyOrchestrator : NetworkBehaviour {
 		using (new Load("Join Lobby...")) {
 			try {
 				
-				JoinLobbyByCodeOptions _options = new JoinLobbyByCodeOptions {
+				/*JoinLobbyByCodeOptions _options = new JoinLobbyByCodeOptions {
 					Player = GetThisPlayer()
-				};
+				};*/
 				
-				Lobby _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinInputCode.text, _options);
+				Lobby _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinInputCode.text);
 				//await MatchmakingService.JoinLobbyWithAllocation(_lobby.Id);
 
 				createScreen.gameObject.SetActive(false);
@@ -85,6 +90,7 @@ public class LobbyOrchestrator : NetworkBehaviour {
 				UpdateLobbyCode(_lobby.LobbyCode);
 				// Starting the host immediately will keep the relay server alive
 				NetworkManager.Singleton.StartClient();
+				StartCoroutine(SendNameWhenConnected(GetRawUsername()));
 			} catch (Exception _e) {
 				Debug.LogError(_e);
 				CanvasUtilities.Instance.ShowError("Failed joining lobby");
@@ -96,54 +102,82 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	
 	#region Room
 
-	private readonly Dictionary<ulong, bool> _playersInLobby = new();
-	public static event Action<Dictionary<ulong, bool>> LobbyPlayersUpdated;
-	private float _nextLobbyUpdate;
+	public static readonly Dictionary<ulong, PlayerLobbyNetworkData> PlayersInLobby = new();
+	public static event Action<Dictionary<ulong, PlayerLobbyNetworkData>> LobbyPlayersUpdated;
+	private float nextLobbyUpdate;
 
+	private int TeamPlacement() {
+		int _homePlayers = 0;
+		int _awayPlayers = 0;
+		foreach(PlayerLobbyNetworkData _player in PlayersInLobby.Values)
+		{
+			if (_player.Team == 1) {
+				_homePlayers++;
+			}
+			if (_player.Team == 2) {
+				_awayPlayers++;
+			}
+		}
+
+		return _awayPlayers < _homePlayers ? 2 : 1;
+
+	}
+	
 	public override void OnNetworkSpawn() {
 		if (IsServer) {
 			NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
-			_playersInLobby.Add(NetworkManager.Singleton.LocalClientId, false);
+			PlayersInLobby.Add(NetworkManager.Singleton.LocalClientId, new PlayerLobbyNetworkData() {
+				PlayerName = GetRawUsername(),
+				IsReady = false,
+				Team = TeamPlacement()
+			});
 			UpdateInterface();
 		}
 
 		// Client uses this in case host destroys the lobby
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
-
-
 	}
 
-	private void OnClientConnectedCallback(ulong playerId) {
+	private void OnClientConnectedCallback(ulong _playerId) {
 		if (!IsServer) return;
-
+		Debug.Log($"Server detected new player with id {_playerId} connected");
 		// Add locally
-		if (!_playersInLobby.ContainsKey(playerId)) _playersInLobby.Add(playerId, false);
+		if (!PlayersInLobby.ContainsKey(_playerId)) {
+			PlayersInLobby.Add(_playerId, new PlayerLobbyNetworkData() {
+				Team = TeamPlacement()
+			});
+			Debug.Log($"Player {_playerId} added to server lobby list");
+		}
 
 		PropagateToClients();
-
-		UpdateInterface();
+		//UpdateInterface();
 	}
 
 	private void PropagateToClients() {
-		foreach (var player in _playersInLobby) UpdatePlayerClientRpc(player.Key, player.Value);
+		foreach (var _player in PlayersInLobby) UpdatePlayerClientRpc(_player.Key, _player.Value);
 	}
 
 	[ClientRpc]
-	private void UpdatePlayerClientRpc(ulong clientId, bool isReady) {
+	private void UpdatePlayerClientRpc(ulong _clientId, PlayerLobbyNetworkData _lobbyNetworkData) {
 		if (IsServer) return;
 
-		if (!_playersInLobby.ContainsKey(clientId)) _playersInLobby.Add(clientId, isReady);
-		else _playersInLobby[clientId] = isReady;
+		if (!PlayersInLobby.ContainsKey(_clientId)) {
+			PlayersInLobby.Add(_clientId, _lobbyNetworkData);
+			Debug.Log($"Adding new player {_clientId} to client lobby");
+		} else {
+			Debug.Log($"Updating existing player {_clientId} in client lobby");
+			PlayersInLobby[_clientId] = _lobbyNetworkData;
+		}
 		UpdateInterface();
 	}
 
-	private void OnClientDisconnectCallback(ulong playerId) {
+	private void OnClientDisconnectCallback(ulong _playerId) {
 		if (IsServer) {
 			// Handle locally
-			if (_playersInLobby.ContainsKey(playerId)) _playersInLobby.Remove(playerId);
+			if (PlayersInLobby.ContainsKey(_playerId)) PlayersInLobby.Remove(_playerId);
 
 			// Propagate all clients
-			RemovePlayerClientRpc(playerId);
+			RemovePlayerClientRpc(_playerId);
 
 			UpdateInterface();
 		} else {
@@ -155,31 +189,50 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	private void RemovePlayerClientRpc(ulong clientId) {
+	private void RemovePlayerClientRpc(ulong _clientId) {
 		if (IsServer) return;
 
-		if (_playersInLobby.ContainsKey(clientId)) _playersInLobby.Remove(clientId);
+		if (PlayersInLobby.ContainsKey(_clientId)) PlayersInLobby.Remove(_clientId);
 		UpdateInterface();
 	}
 
 	public void OnReadyClicked() {
-		SetReadyServerRpc(NetworkManager.Singleton.LocalClientId);
+		ToggleReadyServerRpc(NetworkManager.Singleton.LocalClientId);
+	}
+
+	IEnumerator SendNameWhenConnected(string _value) {
+		yield return new WaitUntil(() => NetworkManager.Singleton.IsConnectedClient);
+		UpdatePlayerNameServerRpc(NetworkManager.Singleton.LocalClientId, _value);
 	}
 
 	[ServerRpc(RequireOwnership = false)]
-	private void SetReadyServerRpc(ulong playerId) {
-		_playersInLobby[playerId] = true;
+	private void UpdatePlayerNameServerRpc(ulong _playerId, string _value) {
+		var _playerLobbyNetworkData = PlayersInLobby[_playerId];
+		_playerLobbyNetworkData.PlayerName = _value;
+		PlayersInLobby[_playerId] = _playerLobbyNetworkData;
+		
+		Debug.Log($"Player {_playerId} set name to {PlayersInLobby[_playerId].PlayerName}");
+		PropagateToClients();
+		UpdateInterface();
+	}
+	
+	[ServerRpc(RequireOwnership = false)]
+	private void ToggleReadyServerRpc(ulong _playerId) {
+		var _playerLobbyNetworkData = PlayersInLobby[_playerId];
+		_playerLobbyNetworkData.IsReady = !_playerLobbyNetworkData.IsReady;
+		PlayersInLobby[_playerId] = _playerLobbyNetworkData;
+		Debug.Log($"Player {_playerId} named {PlayersInLobby[_playerId].PlayerName} set to {_playerLobbyNetworkData.IsReady}");
 		PropagateToClients();
 		UpdateInterface();
 	}
 
 	private void UpdateInterface() {
-		LobbyPlayersUpdated?.Invoke(_playersInLobby);
+		LobbyPlayersUpdated?.Invoke(PlayersInLobby);
 	}
 
 	private async void OnLobbyLeft() {
 		using (new Load("Leaving Lobby...")) {
-			_playersInLobby.Clear();
+			PlayersInLobby.Clear();
 			NetworkManager.Singleton.Shutdown();
 			//await MatchmakingService.LeaveLobby();
 			await LobbyService.Instance.RemovePlayerAsync(currentLobbyId, AuthenticationService.Instance.PlayerId);
@@ -247,11 +300,48 @@ public class LobbyOrchestrator : NetworkBehaviour {
 
 	private string GetRawUsername() {
 		string _username = AuthenticationService.Instance.PlayerName;
-		int hashIndex = _username.IndexOf('#');
-		if (hashIndex != -1) {
-			_username = _username.Substring(0, hashIndex);
+		int _hashIndex = _username.IndexOf('#');
+		if (_hashIndex != -1) {
+			_username = _username.Substring(0, _hashIndex);
 		}
 		_username = _username.Substring(0, Mathf.Min(_username.Length, 11));
 		return _username;
 	}
+	
+	public struct PlayerLobbyNetworkData : INetworkSerializable {
+		private ulong id;
+		private FixedString32Bytes playerName;
+		private bool isReady;
+		private int team;
+	
+		internal ulong Id {
+			get => id;
+			set => id = value;
+		}
+
+		internal string PlayerName {
+			get => playerName.ToString();
+			set => playerName = (FixedString32Bytes)value;
+		}
+		
+		internal bool IsReady {
+			get => isReady;
+			set => isReady = value;
+		}
+		
+		internal int Team {
+			get => team;
+			set => team = value;
+		}
+	
+		public void NetworkSerialize<T>(BufferSerializer<T> _serializer) where T : IReaderWriter {
+			_serializer.SerializeValue(ref id);
+			_serializer.SerializeValue(ref playerName);
+			_serializer.SerializeValue(ref isReady);
+			_serializer.SerializeValue(ref team);
+		}
+	}
 }
+
+
+

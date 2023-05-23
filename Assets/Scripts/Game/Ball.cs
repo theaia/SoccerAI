@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Ball : MonoBehaviour
+public class Ball : NetworkBehaviour
 {
 	Rigidbody2D rb;
 	Collider2D col;
@@ -25,6 +26,9 @@ public class Ball : MonoBehaviour
 
 	private float timeout = 25f;
 	private float timeoutTimer;
+	
+	private readonly NetworkVariable<BallNetworkData>
+		netState = new(writePerm: NetworkVariableWritePermission.Server);
 
 	private void Awake() {
 		rb = GetComponent<Rigidbody2D>();
@@ -38,6 +42,7 @@ public class Ball : MonoBehaviour
 
 	public void Reset(bool _enablePhysics) {
 		//Debug.Log("Resetting ball");
+		if(!IsServer) return;
 		SetBallCarrier(null);
 		timeoutTimer = 0;
 		col.enabled = false;
@@ -115,30 +120,39 @@ public class Ball : MonoBehaviour
 	}
 
 	private void Update() {
-		CheckOutOfBounds();
+		if(IsServer){
+			netState.Value = new BallNetworkData() {
+				Position = transform.position
+			};
+			
+			CheckOutOfBounds();
 
-		if (rb.velocity.magnitude < 1f /*&& !GameManager.Instance.GetIsTraining()*/) {
-			timeoutTimer += Time.deltaTime;
-			if (timeoutTimer > timeout) {
-				GameManager.Instance.SetGameState(GameState.Whistle);
+			if (rb.velocity.magnitude < 1f /*&& !GameManager.Instance.GetIsTraining()*/) {
+				timeoutTimer += Time.deltaTime;
+				if (timeoutTimer > timeout) {
+					GameManager.Instance.SetGameState(GameState.Whistle);
+				}
+			} else {
+				timeoutTimer = 0f;
 			}
+
+			if (rb.velocity.magnitude < .01f && !ballCarrier) {
+				return;
+			}
+
+			currentFrame++;
+			//Debug.Log("Ball Speed: " + rb.velocity.magnitude);
+			float _ballSpeed = ballCarrier ? ballCarrier.GetVelocityMagnitude() : rb.velocity.magnitude;
+			float _cappedSpeed = Mathf.Clamp(Mathf.Abs(_ballSpeed), 0, CappedBallSpeed);
+			float _framerate = Mathf.Lerp(MinBallSpeedFrameRate, MaxBallSpeedFrameRate, _cappedSpeed / BallSpeedAtMaxFrameRate);
+			if (currentFrame >= _framerate) {
+				currentAnimFrame = currentAnimFrame == activeAnim.Length - 1 ? 0 : currentAnimFrame + 1;
+				rend.sprite = activeAnim[currentAnimFrame];
+				currentFrame = 0;
+			}
+			
 		} else {
-			timeoutTimer = 0f;
-		}
-
-		if (rb.velocity.magnitude < .01f && !ballCarrier) {
-			return;
-		}
-
-		currentFrame++;
-		//Debug.Log("Ball Speed: " + rb.velocity.magnitude);
-		float _ballSpeed = ballCarrier ? ballCarrier.GetVelocityMagnitude() : rb.velocity.magnitude;
-		float _cappedSpeed = Mathf.Clamp(Mathf.Abs(_ballSpeed), 0, CappedBallSpeed);
-		float _framerate = Mathf.Lerp(MinBallSpeedFrameRate, MaxBallSpeedFrameRate, _cappedSpeed / BallSpeedAtMaxFrameRate);
-		if (currentFrame >= _framerate) {
-			currentAnimFrame = currentAnimFrame == activeAnim.Length - 1 ? 0 : currentAnimFrame + 1;
-			rend.sprite = activeAnim[currentAnimFrame];
-			currentFrame = 0;
+			transform.position = netState.Value.Position;
 		}
 	}
 
@@ -163,6 +177,7 @@ public class Ball : MonoBehaviour
 	}
 
 	private void FixedUpdate() {
+		if (!IsServer) return;
 		if (ballCarrier != null && ballCarrier.targetBallPosition != null) {
 			rb.MovePosition(Vector3.Lerp(transform.position, (Vector2)ballCarrier.transform.position + ballCarrier.targetBallPosition, ballCarryingLerpSpeed * Time.fixedDeltaTime));
 		}
@@ -223,5 +238,26 @@ public class Ball : MonoBehaviour
 			Reset(true);
 		}
 	}
+	
+	struct BallNetworkData : INetworkSerializable {
+		private float posX;
+		private float posY;
 
+		internal Vector2 Position {
+			get => new Vector2(posX, posY);
+			set {
+				posX = value.x;
+				posY = value.y;
+			}
+		}
+
+
+		public void NetworkSerialize<T>(BufferSerializer<T> _serializer) where T : IReaderWriter {
+			_serializer.SerializeValue(ref posX);
+			_serializer.SerializeValue(ref posY);
+		}
+	}
+	
 }
+
+

@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public enum Role {
@@ -10,13 +13,13 @@ public enum Role {
     Human
 }
 
-public class Player : MonoBehaviour
-{
+public class Player : NetworkBehaviour {
     private InputData inputData = new InputData() {
         Move = Vector2.zero,
         Sprint = false,
         Ability = false
     };
+
     private KeyboardInput[] m_Inputs;
     private List<AnimController> animController = new List<AnimController>();
 
@@ -29,13 +32,16 @@ public class Player : MonoBehaviour
     private string lastCollidedObjectTagged;
     private Vector2 formationLocation;
 
-	[SerializeField] private Country country;
-	[SerializeField] private Team team;
+    [SerializeField] private Country country;
+    [SerializeField] private Team team;
     [SerializeField] private Role role;
+    
+    private string skin = "-1";
 
     private PlayerAgent agent;
     private AIAstar aiaStar;
     private LocalPerception localPerception;
+    private CharacterCustomization characterCustomization;
 
     private bool canShoot = true;
     private bool isCheering = false;
@@ -45,9 +51,24 @@ public class Player : MonoBehaviour
     [HideInInspector] public bool m_CanControl;
     [HideInInspector] public bool IsTransitioning;
 
+    private readonly NetworkVariable<PlayerNetworkData>
+        netState = new(writePerm: NetworkVariableWritePermission.Owner);
+    
+    private void Awake() {
+        SetTeam(team);
+        
+        rb = GetComponent<Rigidbody2D>();
+        agent = GetComponent<PlayerAgent>();
+        aiaStar = GetComponent<AIAstar>();
+        localPerception = GetComponentInChildren<LocalPerception>();
+        m_Inputs = GetComponents<KeyboardInput>();
+        
+        characterCustomization = GetComponentInChildren<CharacterCustomization>();
+    }
+
     public PlayerAgent GetAgent() {
         return agent;
-	}
+    }
 
     public AIAstar GetAIAStar() {
         return aiaStar;
@@ -55,7 +76,7 @@ public class Player : MonoBehaviour
 
     public float GetSpeed() {
         return speed;
-	}
+    }
 
     public Country GetCountry() {
         return country;
@@ -65,17 +86,30 @@ public class Player : MonoBehaviour
         return isBallNearby;
     }
 
+    public void SetCosmetics(string _skinId, string _countryId, int _teamInt) {
+        characterCustomization.SetCosmetics(_skinId, _countryId, _teamInt);
+    }
+    
+    public string GetSkin() {
+        return skin;
+    }
+    
+    public void SetSkin(string _value) {
+        skin = _value;
+        Debug.Log("Set string value to " + _value);
+    }
+
     public void SetIsCheering(bool _value) {
         isCheering = _value;
-	}
+    }
 
     public void Reset() {
-        rb.velocity = Vector2.zero;
+        if(rb) rb.velocity = Vector2.zero;
         inputData = new InputData() {
             Move = Vector2.zero,
             Sprint = false,
             Ability = false
-		};
+        };
         aiaStar.Reset();
         canShoot = true;
         stamina = GameManager.Instance.maxStamina;
@@ -92,17 +126,12 @@ public class Player : MonoBehaviour
 
     public float GetDistanceToBall() {
         return Vector2.Distance(transform.position, GameManager.Instance.GetBallLocation());
-	}
+    }
 
-	private void Awake() {
-        SetTeam(team);
-        //m_Inputs = GetComponents<KeyboardInput>();
-        rb = GetComponent<Rigidbody2D>();
-        agent = GetComponent<PlayerAgent>();
-        aiaStar = GetComponent<AIAstar>();
-        localPerception = GetComponentInChildren<LocalPerception>();
-        m_Inputs = GetComponents<KeyboardInput>();
 
+
+    IEnumerator Start() {
+        yield return new WaitUntil(() => GameManager.Instance);
         gameObject.name = GameManager.Instance.GetRandomName();
         stamina = GameManager.Instance.maxStamina;
         UpdateChargeDisplay();
@@ -112,6 +141,7 @@ public class Player : MonoBehaviour
     public void SetTeam(Team _team) {
         team = _team;
         gameObject.tag = team == Team.Home ? "home" : "away";
+        
     }
 
     public string[] GetLocalPerception() {
@@ -121,7 +151,9 @@ public class Player : MonoBehaviour
     public string GetLocalDirPerception(int _dir) {
         return localPerception.GetLocalPerceptionDirInfo(_dir);
     }
+
     public void SetHasBall(bool _value) {
+        if (!GameManager.Instance) return;
         hasBall = _value;
         gameObject.layer = hasBall ? LayerMask.NameToLayer("BallCarrier") : LayerMask.NameToLayer("Player");
         if (!hasBall) {
@@ -133,11 +165,11 @@ public class Player : MonoBehaviour
 
     public void SetFormationLocation(Vector2 _value) {
         formationLocation = _value;
-	}
+    }
 
     public Vector2 GetFormationLocation() {
         return formationLocation;
-	}
+    }
 
     public void SetMovement(Vector2 _movement) {
         inputData.Move = _movement;
@@ -158,7 +190,7 @@ public class Player : MonoBehaviour
     public void Pass() {
         if (agent) {
             agent.PasserReward();
-		}
+        }
 
     }
 
@@ -170,7 +202,7 @@ public class Player : MonoBehaviour
 
     public Role GetRole() {
         return role;
-	}
+    }
 
     public void TackleGiveaway() {
         if (agent) {
@@ -196,11 +228,11 @@ public class Player : MonoBehaviour
 
     public Team GetTeam() {
         return team;
-	}
+    }
 
     public Vector2 GetCurrentMoveInput() {
         return inputData.Move;
-	}
+    }
 
     public void GenerateNewInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
         inputData = new InputData {
@@ -210,28 +242,36 @@ public class Player : MonoBehaviour
         };
     }
 
-    public void ProcessInputs(Vector2 _moveDir, bool _ability, bool _sprint) {
+    public void ProcessInputs(Vector2 _moveDir, bool _ability, bool _sprint, bool _isNetState = false) {
+        if(!GameManager.Instance) {
+            return;
+        }
         //Debug.Log("processing inputs");
-        Animate(isCheering);
+        Animate(_moveDir, isCheering);
 
         CheckOutOfBounds();
 
         if (!GameManager.Instance.GetCanMove()) {
             //Debug.Log("Can't process input.  Player can't move");
             return;
-		}
-        _moveDir = Utils.DirToClosestInput(_moveDir).normalized;
+        }
+        
+
+        _moveDir = Utils.V2ToClosestInput(_moveDir).normalized;
         //Debug.Log($"{gameObject.name} current move input: {_moveDir}");
-        Vector3 _velocity = _moveDir * speed * Time.deltaTime;
-        rb.velocity = _velocity;
+        Vector3 _velocity = speed * _moveDir;
+        if(!_isNetState) rb.velocity = _velocity;
         //Debug.Log($"{gameObject.name} current move input: {_moveDir}.  Calc'd velocity: {_velocity}");
 
         if (_ability && canShoot) {
             if (this == GameManager.Instance.GetBallCarrier()) {
                 ChargeShot();
-            } else if (isBallNearby) {
+            }
+            else if (isBallNearby) {
                 Player _ballCarrier = GameManager.Instance.GetBallCarrier();
+
                 #region Tackle
+
                 if (_ballCarrier) {
                     float _ballCarrierStamina = _ballCarrier.GetCurrentStamina();
                     float _currentPlayerStamina = GetCurrentStamina();
@@ -240,26 +280,33 @@ public class Player : MonoBehaviour
                         _ballCarrier.ConsumeStamina(_currentPlayerStamina);
                         ConsumeStamina(_currentPlayerStamina);
                         return;
-                    } else {
+                    }
+                    else {
                         _ballCarrier.ConsumeStamina(_ballCarrierStamina);
                         ConsumeStamina(_ballCarrierStamina);
                     }
                 }
+
                 #endregion
+
                 GameManager.Instance.SetBallCarrier(this);
                 shotChargeTime = 0;
                 UpdateChargeDisplay();
             }
-        } else if (shotChargeTime > GameManager.Instance.minChargeForShot) {
+        }
+        else if (shotChargeTime > GameManager.Instance.minChargeForShot) {
             Shoot();
         }
+
         if (_sprint && stamina > GameManager.Instance.staminaConsumeRate) {
             if (speed == GameManager.Instance.standardSpeed) {
                 StopCoroutine(FadeToSprintSpeed(GameManager.Instance.speedLerp));
                 StartCoroutine(FadeToSprintSpeed(GameManager.Instance.speedLerp));
-            };
+            }
+            
             ConsumeStamina(GameManager.Instance.staminaConsumeRate);
-        } else if (speed != GameManager.Instance.standardSpeed) {
+        }
+        else if (speed != GameManager.Instance.standardSpeed) {
             StopCoroutine(FadeToSprintSpeed(GameManager.Instance.speedLerp));
             speed = GameManager.Instance.standardSpeed;
         }
@@ -297,7 +344,8 @@ public class Player : MonoBehaviour
         float _chargePct = Mathf.Clamp01(stamina / GameManager.Instance.maxStamina);
         float _lerp = Mathf.Lerp(0, 1, _chargePct);
 
-        staminaSprite.transform.localScale = new Vector3(_lerp, staminaSprite.transform.localScale.y, staminaSprite.transform.localScale.z);
+        staminaSprite.transform.localScale = new Vector3(_lerp, staminaSprite.transform.localScale.y,
+            staminaSprite.transform.localScale.z);
         Invoke("DisableStaminaDisplay", GameManager.Instance.staminaDisplayTime);
     }
 
@@ -310,7 +358,8 @@ public class Player : MonoBehaviour
     }
 
     private void ChargeShot() {
-        shotChargeTime = Mathf.Clamp(shotChargeTime + GameManager.Instance.shotChargeRate, 0f , GameManager.Instance.maxChargeTime);
+        shotChargeTime = Mathf.Clamp(shotChargeTime + GameManager.Instance.shotChargeRate, 0f,
+            GameManager.Instance.maxChargeTime);
         if (shotChargeTime > GameManager.Instance.minChargeForShot) {
             UpdateChargeDisplay();
         }
@@ -318,26 +367,27 @@ public class Player : MonoBehaviour
 
     private void Shoot() {
         if (this == GameManager.Instance.GetBallCarrier()) {
-            Vector2 _shot = GetDirection() * Mathf.Lerp(GameManager.Instance.ShotMinStrength, GameManager.Instance.ShotMaxStrength, shotChargeTime / GameManager.Instance.maxChargeTime);
+            Vector2 _shot = GetDirection() * Mathf.Lerp(GameManager.Instance.ShotMinStrength,
+                GameManager.Instance.ShotMaxStrength, shotChargeTime / GameManager.Instance.maxChargeTime);
             GameManager.Instance.ShootBall(_shot);
         }
 
         shotChargeTime = 0;
         UpdateChargeDisplay();
     }
-    
+
     private void ResetCanShootTimer() {
         canShoot = true;
-	}
+    }
 
     public bool GetCanShoot() {
         return canShoot;
-	}
-    
+    }
+
     private Vector2 GetDirection() {
         State _currentState = animController[0].GetAnimState();
         Vector2 direction;
-		switch (_currentState) {
+        switch (_currentState) {
             default:
                 direction = Vector2.zero;
                 break;
@@ -351,90 +401,189 @@ public class Player : MonoBehaviour
                 direction = Vector2.right;
                 break;
             case State.rightdown:
-                direction = new Vector2(0.707f, -0.707f); ;
+                direction = new Vector2(0.707f, -0.707f);
+                ;
                 break;
             case State.down:
                 direction = Vector2.down;
                 break;
             case State.leftdown:
-                direction = new Vector2(-0.707f, -0.707f); ;
+                direction = new Vector2(-0.707f, -0.707f);
+                ;
                 break;
             case State.left:
                 direction = Vector2.left;
                 break;
             case State.leftup:
-                direction = new Vector2(-0.707f, 0.707f); ;
+                direction = new Vector2(-0.707f, 0.707f);
+                ;
                 break;
         }
 
         return direction;
-	}
-
-	private void LateUpdate() {
-        if (GameManager.Instance.GetIsTransitioning()) {
-            aiaStar.SetTarget(GetFormationLocation());
-        } else if (GetRole() == Role.Human) {
-            for (int i = 0; i < m_Inputs.Length; i++) {
-                inputData = m_Inputs[i].GenerateInput();
-            }
-        }
-
-        ProcessInputs(inputData.Move, inputData.Ability, inputData.Sprint);
     }
 
-	private void UpdateChargeDisplay() {
+    private void LateUpdate() {
+        if (IsOwner) {
+            //Debug.Log("IsOwner.  Processing Inputs.");
+            if (GameManager.Instance.GetIsTransitioning()) {
+                aiaStar.SetTarget(GetFormationLocation());
+            } else if (GetRole() == Role.Human && GameManager.Instance.GetCanMove() &&
+                      !GameManager.Instance.GetIsTransitioning()) {
+                for (int i = 0; i < m_Inputs.Length; i++) {
+                    inputData = m_Inputs[i].GenerateInput();
+                }
+            }
+
+            ProcessInputs(inputData.Move, inputData.Ability, inputData.Sprint);
+            
+            netState.Value = new PlayerNetworkData() {
+                Move = inputData.Move,
+                HasBall = hasBall,
+                Charge = shotChargeTime,
+                IsCharging = inputData.Ability,
+                Stamina = stamina,
+                IsSprinting = inputData.Sprint,
+            };
+            //Debug.Log($"Sending New move data.  {netState.Value.Move}");
+        } else {
+            //Debug.Log($"Processing Net state. Input {netState.Value.Move}");
+            ProcessInputs(netState.Value.Move, netState.Value.IsCharging, netState.Value.IsSprinting, true);
+            SetHasBall(netState.Value.HasBall);
+            stamina = netState.Value.Stamina;
+            shotChargeTime = netState.Value.Charge;
+        }
+    }
+
+    private void UpdateChargeDisplay() {
+        if (!GameManager.Instance) {
+            return;
+        }
         float _chargePct = Mathf.Clamp01(shotChargeTime / GameManager.Instance.maxChargeTime);
         float _lerp = Mathf.Lerp(0, 1, _chargePct);
 
-        chargeSprite.transform.localScale = new Vector3(_lerp, chargeSprite.transform.localScale.y, chargeSprite.transform.localScale.z);
+        chargeSprite.transform.localScale = new Vector3(_lerp, chargeSprite.transform.localScale.y,
+            chargeSprite.transform.localScale.z);
         chargeSprite.transform.parent.gameObject.SetActive(shotChargeTime > 0 && hasBall);
     }
 
     public void SetBallAround(bool _value) {
         isBallNearby = _value;
-	}
+    }
 
     public float GetVelocityMagnitude() {
         return rb.velocity.magnitude;
-	}
+    }
 
-    private void Animate(bool _cheering = false) {
+    private void Animate(Vector2 input, bool _cheering = false) {
+        if (!GameManager.Instance) {
+            return;
+        }
+        
         State _currentState;
-		if (_cheering) {
-			_currentState = State.cheer;
-		} else if (!GameManager.Instance.GetCanMove()) {
-			_currentState = State.idle;
-		} else {
-			_currentState = Utils.GetState(inputData.Move);
+        if (_cheering) {
+            _currentState = State.cheer;
+        }
+        else if (!GameManager.Instance.GetCanMove()) {
+            _currentState = State.idle;
+        }
+        else {
+            _currentState = Utils.GetState(Utils.V2ToClosestInput(input));
             if (hasBall) {
                 targetBallPosition = Utils.GetTargetBallPosFromState(_currentState);
             }
-		}
+        }
 
-		foreach (AnimController _anim in animController) {
-			_anim.SetAnimState(_currentState);
+        foreach (AnimController _anim in animController) {
+            _anim.SetAnimState(_currentState);
         }
     }
 
 
-	private void OnCollisionEnter2D(Collision2D collision) {
+    private void OnCollisionEnter2D(Collision2D collision) {
         lastCollidedObjectTagged = collision.gameObject.tag;
     }
 
     public void ClearLastCollidedObject() {
         lastCollidedObjectTagged = string.Empty;
-	}
+    }
 
     public string GetLastCollidedObject() {
         return lastCollidedObjectTagged;
     }
 
     private void CheckOutOfBounds() {
-        if(transform.position.x < GameManager.Instance.ArenaWidth.x ||
+        if(!GameManager.Instance){
+            return;
+        }
+        if (transform.position.x < GameManager.Instance.ArenaWidth.x ||
             transform.position.x > GameManager.Instance.ArenaWidth.y ||
             transform.position.y < GameManager.Instance.ArenaHeight.x ||
             transform.position.y > GameManager.Instance.ArenaHeight.y) {
             transform.position = formationLocation;
-		}
+        }
+    }
+
+    public void OnNetworkSpawn() {
+        if (!IsOwner) Destroy(this);
+    }
+
+    struct PlayerNetworkData : INetworkSerializable {
+        private float moveX;
+        private float moveY;
+        private bool hasBall;
+        private float speed;
+        private byte charge;
+        private bool isCharging;
+        private byte stamina;
+        private bool isSprinting;
+
+        internal Vector2 Move {
+            get => new Vector2(moveX, moveY);
+            set {
+                moveX = value.x;
+                moveY = value.y;
+            }
+        }
+        internal bool HasBall {
+            get => hasBall;
+            set { hasBall = value; }
+        }
+        
+        internal float Speed {
+            get => speed;
+            set { speed = value; }
+        }
+        internal float Charge {
+            get => charge;
+            set { charge = (byte)value; }
+        }
+        
+        internal bool IsCharging {
+            get => isCharging;
+            set { isCharging = value; }
+        }
+
+        internal float Stamina {
+            get => stamina;
+            set { stamina = (byte)value; }
+        }
+
+        internal bool IsSprinting {
+            get => isSprinting;
+            set { isSprinting = value; }
+        }
+        
+
+        public void NetworkSerialize<T>(BufferSerializer<T> _serializer) where T : IReaderWriter {
+            _serializer.SerializeValue(ref moveX);
+            _serializer.SerializeValue(ref moveY);
+            _serializer.SerializeValue(ref hasBall);
+            _serializer.SerializeValue(ref speed);
+            _serializer.SerializeValue(ref charge);
+            _serializer.SerializeValue(ref isCharging);
+            _serializer.SerializeValue(ref stamina);
+            _serializer.SerializeValue(ref isSprinting);
+        }
     }
 }

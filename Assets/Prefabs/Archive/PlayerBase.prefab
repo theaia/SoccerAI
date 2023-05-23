@@ -690,10 +690,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b92b375e3efa5c4fa57e0a2f4397bfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
   country: 0
   team: 1
-  role: 0
+  role: 4
   targetBallPosition: {x: 0, y: 0}
   chargeSprite: {fileID: 6944332947235226135}
   staminaSprite: {fileID: 3058301022749634112}

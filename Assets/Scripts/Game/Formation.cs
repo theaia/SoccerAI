@@ -28,10 +28,6 @@ public class Formation : MonoBehaviour
 			} else {
 				Vector2 _location = Utils.GetDefendingZoneBasedLocation(spotList[i].transform.position, _team);
 				Player _newPlayer = Instantiate(GameManager.Instance.GetPlayerPrefab(_team), Utils.GetDefendingZoneBasedLocation(spotList[i].transform.position, _team), Quaternion.identity, null).GetComponent<Player>();
-				if(i == 0) {
-					CountryInfo _countryInfo = Utils.GetCountryInfo(_newPlayer.GetCountry());
-					GameManager.Instance.SetCountryInfo(_team, _countryInfo);
-				}
 				_newPlayer.SetFormationLocation(_location);
 				_newPlayer.SetTeam(_team);
 				_newPlayer.SetRole(spotList[i].Role);

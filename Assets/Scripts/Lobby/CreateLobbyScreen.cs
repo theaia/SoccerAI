@@ -9,7 +9,7 @@ public class CreateLobbyScreen : MonoBehaviour {
     public void OnCreateClicked() {
         var _lobbyData = new LobbyData {
             Name = $"Lobby #{Random.value * 1000f}",
-            MaxPlayers = 2,
+            MaxPlayers = 8,
         };
 
         LobbyCreated?.Invoke(_lobbyData);

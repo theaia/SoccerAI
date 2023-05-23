@@ -12,6 +12,8 @@ public class CountryInfo : ScriptableObject {
 }
 
 public enum Country {
+	Home,
+	Away,
 	Armenia,
 	Australia,
 	Canada,

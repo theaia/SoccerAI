@@ -58,7 +58,7 @@ public class AIAstar : MonoBehaviour {
             Vector3 _target = path.vectorPath[currentWaypoint];
             Vector3 dir = _target - transform.position;
             //Debug.Log($"Raw Dir: {dir}");
-            dir = Utils.DirToClosestInput(dir);
+            dir = Utils.V2ToClosestInput(dir);
             //Debug.DrawLine(_target, _target + dir * .1f, Color.cyan);
             //Debug.Log($"{player.name} | Target: {_target} | Transform: {transform.position} | Dir: {dir}");
             //Debug.Log(dir);
