@@ -140,6 +140,8 @@ public class LobbyOrchestrator : NetworkBehaviour {
 
 	private void OnClientConnectedCallback(ulong _playerId) {
 		if (!IsServer) return;
+		if (IsServer && _playerId == OwnerClientId) return;
+		
 		Debug.Log($"Server detected new player with id {_playerId} connected");
 		// Add locally
 		if (!PlayersInLobby.ContainsKey(_playerId)) {

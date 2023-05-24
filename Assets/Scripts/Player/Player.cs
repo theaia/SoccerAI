@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum Role {
@@ -55,7 +56,7 @@ public class Player : NetworkBehaviour {
         netState = new(writePerm: NetworkVariableWritePermission.Owner);
     
     private void Awake() {
-        SetTeam(team);
+        if(GameManager.Instance && GameManager.Instance.GetGameMode() == GameMode.SinglePlayer) SetTeam(team);
         
         rb = GetComponent<Rigidbody2D>();
         agent = GetComponent<PlayerAgent>();
@@ -87,6 +88,7 @@ public class Player : NetworkBehaviour {
     }
 
     public void SetCosmetics(string _skinId, string _countryId, int _teamInt) {
+        if(characterCustomization == null) characterCustomization = GetComponentInChildren<CharacterCustomization>();
         characterCustomization.SetCosmetics(_skinId, _countryId, _teamInt);
     }
     
@@ -96,7 +98,6 @@ public class Player : NetworkBehaviour {
     
     public void SetSkin(string _value) {
         skin = _value;
-        Debug.Log("Set string value to " + _value);
     }
 
     public void SetIsCheering(bool _value) {
@@ -110,7 +111,7 @@ public class Player : NetworkBehaviour {
             Sprint = false,
             Ability = false
         };
-        aiaStar.Reset();
+        if(aiaStar) aiaStar.Reset();
         canShoot = true;
         stamina = GameManager.Instance.maxStamina;
         shotChargeTime = 0f;
@@ -138,10 +139,14 @@ public class Player : NetworkBehaviour {
         UpdateStaminaDisplay();
     }
 
+    private void OnEnable() {
+        transform.position = formationLocation;
+    }
+
     public void SetTeam(Team _team) {
         team = _team;
         gameObject.tag = team == Team.Home ? "home" : "away";
-        
+        GameManager.Instance.AddPlayer(this, team);
     }
 
     public string[] GetLocalPerception() {
@@ -164,6 +169,7 @@ public class Player : NetworkBehaviour {
     }
 
     public void SetFormationLocation(Vector2 _value) {
+        Debug.Log($"Formation on {OwnerClientId} set to {_value}");
         formationLocation = _value;
     }
 
@@ -428,8 +434,10 @@ public class Player : NetworkBehaviour {
             //Debug.Log("IsOwner.  Processing Inputs.");
             if (GameManager.Instance.GetIsTransitioning()) {
                 aiaStar.SetTarget(GetFormationLocation());
+                //Debug.Log("Game is transitioning.  Setting to target.");
             } else if (GetRole() == Role.Human && GameManager.Instance.GetCanMove() &&
-                      !GameManager.Instance.GetIsTransitioning()) {
+                       !GameManager.Instance.GetIsTransitioning()) {
+                //Debug.Log($"Can move: {GameManager.Instance.GetCanMove()} IsTransitioning: {GameManager.Instance.GetIsTransitioning()}");
                 for (int i = 0; i < m_Inputs.Length; i++) {
                     inputData = m_Inputs[i].GenerateInput();
                 }
@@ -522,6 +530,10 @@ public class Player : NetworkBehaviour {
             transform.position.y > GameManager.Instance.ArenaHeight.y) {
             transform.position = formationLocation;
         }
+    }
+
+    private void OnDestroy() {
+        GameManager.Instance.RemovePlayer(this);
     }
 
     public void OnNetworkSpawn() {

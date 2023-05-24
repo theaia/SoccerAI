@@ -25,6 +25,7 @@ public class AIAstar : MonoBehaviour {
 	}
 
     public void SetTarget(Vector2 _targetPosition) {
+        //Debug.Log($"Setting transition to: {_targetPosition}");
         if(GameManager.Instance && !GameManager.Instance.GetIsTransitioning() && targetPosition.HasValue && Vector2.Distance(_targetPosition, targetPosition.Value) < .04f) {
             //Debug.Log($"Exiting Set target because target: {targetPosition.HasValue} && target disance to existing is less than .01");
             return;
@@ -35,7 +36,8 @@ public class AIAstar : MonoBehaviour {
 		}
 
         if(GameManager.Instance && GameManager.Instance.GetIsTransitioning()) {
-            _targetPosition = player.GetFormationLocation();
+            //Debug.Log($"Setting interior transition to: {player.GetFormationLocation()}");
+            if(player) _targetPosition = player.GetFormationLocation();
         }
 
         targetPosition = _targetPosition;
