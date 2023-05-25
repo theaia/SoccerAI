@@ -4,9 +4,14 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -19,7 +24,7 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	[SerializeField] GameObject createScreen;
 	[SerializeField] GameObject roomScreen;
 	
-	private string currentLobbyId;
+	//private string currentLobbyId;
 	[SerializeField] private bool serverAuth;
 	private PlayerLobbyNetworkData playerData;
 
@@ -30,9 +35,9 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	private void Start() {
 		UpdatePlayerName("AIA" + Random.Range(0,99));
 
-
 		createScreen.SetActive(true);
 		roomScreen.SetActive(false);
+		
 
 		CreateLobbyScreen.LobbyCreated += CreateLobby;
 		RoomScreen.LobbyLeft += OnLobbyLeft;
@@ -49,17 +54,22 @@ public class LobbyOrchestrator : NetworkBehaviour {
 				/*CreateLobbyOptions _options = new CreateLobbyOptions {
 					Player = GetThisPlayer()
 				};*/
-
-				Lobby _lobby = await LobbyService.Instance.CreateLobbyAsync(_data.Name, _data.MaxPlayers);
+				Allocation _allocation = await RelayService.Instance.CreateAllocationAsync(_data.MaxPlayers - 1);
+				//Lobby _lobby = await LobbyService.Instance.CreateLobbyAsync(_data.Name, _data.MaxPlayers);
 				
 				createScreen.gameObject.SetActive(false);
 				roomScreen.gameObject.SetActive(true);
 
-				currentLobbyId = _lobby.Id;
-				
-				UpdateLobbyCode(_lobby.LobbyCode);
+				//currentLobbyId = _lobby.Id;
+
+				string _joinCode = await RelayService.Instance.GetJoinCodeAsync(_allocation.AllocationId);
+				UpdateLobbyCode(_joinCode);
 				// Starting the host immediately will keep the relay server alive
+				RelayServerData _relayServerData = new RelayServerData(_allocation, "dtls");
+				NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(_relayServerData);
+				
 				NetworkManager.Singleton.StartHost();
+				Debug.Log("Successfully created lobby and started host");
 			} catch (Exception _e) {
 				Debug.LogError(_e);
 				CanvasUtilities.Instance.ShowError("Failed creating lobby");
@@ -73,29 +83,34 @@ public class LobbyOrchestrator : NetworkBehaviour {
 
 	public async void JoinLobby() {
 		using (new Load("Join Lobby...")) {
-			try {
-				
 				/*JoinLobbyByCodeOptions _options = new JoinLobbyByCodeOptions {
 					Player = GetThisPlayer()
 				};*/
 				
-				Lobby _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinInputCode.text);
+				//Lobby _lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinInputCode.text);
 				//await MatchmakingService.JoinLobbyWithAllocation(_lobby.Id);
+				try {
+					JoinAllocation _joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinInputCode.text);
+					
+					createScreen.gameObject.SetActive(false);
+					roomScreen.gameObject.SetActive(true);
 
-				createScreen.gameObject.SetActive(false);
-				roomScreen.gameObject.SetActive(true);
-				
-				currentLobbyId = _lobby.Id;
-				
-				UpdateLobbyCode(_lobby.LobbyCode);
-				// Starting the host immediately will keep the relay server alive
-				NetworkManager.Singleton.StartClient();
-				StartCoroutine(SendNameWhenConnected(GetRawUsername()));
-			} catch (Exception _e) {
-				Debug.LogError(_e);
-				CanvasUtilities.Instance.ShowError("Failed joining lobby");
+					//currentLobbyId = _allocation.AllocationId.ToString();
+					string _joinCode = await RelayService.Instance.GetJoinCodeAsync(_joinAllocation.AllocationId);
+					UpdateLobbyCode(_joinCode);
+					// Starting the host immediately will keep the relay server alive
+					
+					RelayServerData _relayServerData = new RelayServerData(_joinAllocation, "dtls");
+					NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(_relayServerData);
+					
+					NetworkManager.Singleton.StartClient();
+					Debug.Log("Successfully joined lobby and started client");
+					StartCoroutine(SendNameWhenConnected(GetRawUsername()));
+				} catch (RelayServiceException _e) {
+					Debug.Log(_e);
+					CanvasUtilities.Instance.ShowError("Failed joining lobby");
+				}
 			}
-		}
 	}
 
 	#endregion
@@ -156,6 +171,7 @@ public class LobbyOrchestrator : NetworkBehaviour {
 	}
 
 	private void PropagateToClients() {
+		Debug.Log("Updating new lobby info to clients");
 		foreach (var _player in PlayersInLobby) UpdatePlayerClientRpc(_player.Key, _player.Value);
 	}
 
@@ -232,12 +248,13 @@ public class LobbyOrchestrator : NetworkBehaviour {
 		LobbyPlayersUpdated?.Invoke(PlayersInLobby);
 	}
 
-	private async void OnLobbyLeft() {
+	private void OnLobbyLeft() {
 		using (new Load("Leaving Lobby...")) {
 			PlayersInLobby.Clear();
-			NetworkManager.Singleton.Shutdown();
+			if(IsServer) NetworkManager.Singleton.Shutdown();
 			//await MatchmakingService.LeaveLobby();
-			await LobbyService.Instance.RemovePlayerAsync(currentLobbyId, AuthenticationService.Instance.PlayerId);
+			//await LobbyService.Instance.RemovePlayerAsync(currentLobbyId, AuthenticationService.Instance.PlayerId);
+			//NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
 			UpdateLobbyCode();
 			roomScreen.gameObject.SetActive(false);
 			createScreen.gameObject.SetActive(true);
@@ -298,6 +315,13 @@ public class LobbyOrchestrator : NetworkBehaviour {
 				{ "Team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "Home") },
 			}
 		};
+	}
+
+	public void Quit() {
+		if(IsServer) NetworkManager.Shutdown();
+		if(IsClient) NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
+
+		Application.Quit();
 	}
 
 	private string GetRawUsername() {

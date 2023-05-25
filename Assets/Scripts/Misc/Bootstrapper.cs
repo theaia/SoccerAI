@@ -9,5 +9,6 @@ public static class Bootstrapper {
     private static void Initialize() {
         MatchmakingService.ResetStatics();
         Addressables.InstantiateAsync("CanvasUtilities");
+        Addressables.InstantiateAsync("Console");
     }
 }

@@ -139,10 +139,6 @@ public class Player : NetworkBehaviour {
         UpdateStaminaDisplay();
     }
 
-    private void OnEnable() {
-        transform.position = formationLocation;
-    }
-
     public void SetTeam(Team _team) {
         team = _team;
         gameObject.tag = team == Team.Home ? "home" : "away";
@@ -169,7 +165,7 @@ public class Player : NetworkBehaviour {
     }
 
     public void SetFormationLocation(Vector2 _value) {
-        Debug.Log($"Formation on {OwnerClientId} set to {_value}");
+        //Debug.Log($"Formation on {OwnerClientId} set to {_value}");
         formationLocation = _value;
     }
 
@@ -429,7 +425,7 @@ public class Player : NetworkBehaviour {
         return direction;
     }
 
-    private void LateUpdate() {
+    private void Update() {
         if (IsOwner) {
             //Debug.Log("IsOwner.  Processing Inputs.");
             if (GameManager.Instance.GetIsTransitioning()) {

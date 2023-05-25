@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using Random = UnityEngine.Random;
 
 public static class Utils{
@@ -407,33 +409,6 @@ public static class Utils{
         float _newX = Mathf.Clamp(_value.x, GameManager.Instance.ArenaWidth.x + _sideMargins, GameManager.Instance.ArenaWidth.y - _sideMargins);
         float _newY = Mathf.Clamp(_value.y, GameManager.Instance.ArenaHeight.x + _topMargins, GameManager.Instance.ArenaHeight.y - _topMargins);
         return new Vector2(_newX, _newY);
-	}
-
-
-	public static CountryInfo GetCountryInfo(Country targetCountry) {
-        //Debug.Log("Getting country info");
-        List<CountryInfo> _allCountryInfo = LoadAllScriptableObjectsOfType<CountryInfo>();
-		foreach (CountryInfo _countryInfo in _allCountryInfo) {
-			if (_countryInfo.Country == targetCountry) {
-				//Debug.Log("Country found! " + _countryInfo.Abbreviation);
-				return _countryInfo;
-			}
-		}
-		//Debug.Log("Returning null");
-		return null;
-	}
-
-	public static List<T> LoadAllScriptableObjectsOfType<T>() where T : ScriptableObject {
-		string[] guids = AssetDatabase.FindAssets("t:" + typeof(T).Name);
-		List<T> list = new List<T>();
-
-		foreach (string guid in guids) {
-			string path = AssetDatabase.GUIDToAssetPath(guid);
-			T asset = AssetDatabase.LoadAssetAtPath<T>(path);
-			list.Add(asset);
-		}
-
-		return list;
 	}
 
     public static State GetState(Vector2 _input) {

@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum GameMode{
@@ -39,12 +40,12 @@ public class GameManager : NetworkBehaviour {
 	[SerializeField] private Formation[] homeFormations;
 	[SerializeField] private Formation[] awayFormations;
 
-
+	
 	private int homeScore;
 	private int awayScore;
 	private Team lastScoringTeam;
 	private float timer;
-	private float maxTime = 3f * 60f;
+	private float matchDuration = 3 * 60f;
 	[Header("General")]
 	[SerializeField] private TextMeshProUGUI homeScoreText;
 	[SerializeField] private TextMeshProUGUI awayScoreText;
@@ -76,7 +77,7 @@ public class GameManager : NetworkBehaviour {
 	public float ShotMaxStrength { get; private set; } = 100f;
 	public float ShotMinStrength { get; private set; } = 1f;
 	public float ShotCooldown { get; private set; } = 2f;
-	public int animFrameRate { get; private set; } = 40;
+	public int animFrameRate { get; private set; } = 10;
 	public float PerceptionLength { get; private set; } = .75f;
 
 	[Header("Ball")]
@@ -104,6 +105,8 @@ public class GameManager : NetworkBehaviour {
 	public static Dictionary<ulong, Player> NetworkedPlayerList = new Dictionary<ulong, Player>();
 
 	private List<Collider2D> projectedBallCollisionObjects = new List<Collider2D>();
+
+	[SerializeField] private GameObject lobbyButton;
 	private void Awake() {
 		if(Instance != null) {
 			Destroy(this);
@@ -168,27 +171,31 @@ public class GameManager : NetworkBehaviour {
 
 	    PropogateCosmeticsToClients();
 	    PropogateFormationToClients();
-	    
-	    if (NetworkedPlayerList.Count == LobbyOrchestrator.PlayersInLobby.Count) {
-		    ApplyFormations(lastScoringTeam);
-		    SetGameState(GameState.Kickoff);
-	    }
+
+	    StartCoroutine(CheckForAllPlayersSpawned());
     }
 
     IEnumerator CheckForAllPlayersSpawned() {
-	    float _maxTime = 1500f;
+	    float _maxTime = 1000f;
 	    float _timer = 0;
 	    while(_timer < _maxTime) {
 		    _timer += Time.deltaTime;
 		    if (NetworkedPlayerList.Count == LobbyOrchestrator.PlayersInLobby.Count) {
-			    SetGameState(GameState.Playing);
+			    StartOnlineGame();
 			    yield break;
 		    }
 
 		    yield return null;
 	    }
 	    Debug.Log($"All players failed to connect before MaxSpawnTime.  Starting game anyway.");
-	    SetGameState(GameState.Playing);
+	    StartOnlineGame();
+    }
+
+    private void StartOnlineGame() {
+	    timer = matchDuration;
+	    ApplyFormations(lastScoringTeam);
+	    SetGameState(GameState.Kickoff, matchDuration);
+	    
 	    IsGameSetup = true;
 	    isTraining = false;
 	    isOvertime = false;
@@ -209,15 +216,20 @@ public class GameManager : NetworkBehaviour {
 	    if(!IsServer) return;
 	    foreach(var _player in NetworkedPlayerList.Values) {
 		    Vector2 _formation = _player.GetFormationLocation();
-		    Debug.Log($"Sending formation to clients: {_player.OwnerClientId} {_formation}");
+		    //Debug.Log($"Sending formation to clients: {_player.OwnerClientId} {_formation}");
 		    UpdatePlayerFormationClientRpc(_player.OwnerClientId, _formation.x, _formation.y);
 	    }
     }
     
     private void PropogateGoalToClients(){
 	    if(!IsServer) return;
-	    Debug.Log($"Sending goal to clients: {lastScoringTeam} {homeScore} {awayScore}");
+	    //Debug.Log($"Sending goal to clients: {lastScoringTeam} {homeScore} {awayScore}");
 	    GoalClientRpc(Utils.GetEnumIndex(lastScoringTeam), homeScore, awayScore);
+    }
+    
+    private void PropogateTimeToClients(float _time){
+	    if(!IsServer) return;
+	    timer = _time;
     }
 	
     [ClientRpc]
@@ -248,6 +260,13 @@ public class GameManager : NetworkBehaviour {
 	    awayScore = _awayScore;
 	    Debug.Log($"{lastScoringTeam} Goal! {homeScore}-{awayScore}");
 	    UpdateScoreBoard();
+    } 
+    
+    [ClientRpc]
+    public void MatchTimeClientRpc(float _time) {
+	    if (IsServer) return;
+	    
+	    timer = _time;
     } 
 
     private Player GetOrAddPlayerByID(ulong _playerId, Team _team) {
@@ -312,7 +331,7 @@ public class GameManager : NetworkBehaviour {
 			return;
 		}
 		
-		if (currentGameState != GameState.Training) timer = maxTime;
+		if (currentGameState != GameState.Training) timer = matchDuration;
 
 		UpdateScoreBoard();
 		
@@ -377,12 +396,9 @@ public class GameManager : NetworkBehaviour {
 		}
 		TransitioningToFaceoffPos = _value;
 		if (TransitioningToFaceoffPos) {
+			ball.Reset(false);
 			if(checkTransitionCoroutine != null) StopCoroutine(checkTransitionCoroutine);
-			if (IsServer) {
-				checkTransitionCoroutine = StartCoroutine(CheckPlayersHaveTransitioned());
-			} else {
-				checkTransitionCoroutine = StartCoroutine(CheckPlayerHasTransitioned());
-			}
+			checkTransitionCoroutine = StartCoroutine(IsServer ? CheckPlayersHaveTransitioned() : CheckPlayerHasTransitioned());
 		}
 	}
 
@@ -391,17 +407,29 @@ public class GameManager : NetworkBehaviour {
 		yield return new WaitUntil(() => allPlayers.Count > 0);
 		//Debug.Log("At least one player found.  Checking if has transitioned");
 		bool _haveAllPlayersTransitioned = false;
+		List<Vector2> _lastPlayerPos = new List<Vector2>();
 		while (!_haveAllPlayersTransitioned) {
 			for (int i = 0; i < allPlayers.Count; i++) {
 				float _distanceToFormationLocation = Vector2.Distance(allPlayers[i].GetFormationLocation(), allPlayers[i].transform.position);
+				
+
 				if (_distanceToFormationLocation > .05f) {
-					Debug.Log($"{allPlayers[i].name} at {allPlayers[i].transform.position} has not transitioned to {allPlayers[i].GetFormationLocation()}");
+					if (_lastPlayerPos.Count >= i + 1 && _lastPlayerPos[i] == (Vector2)allPlayers[i].transform.position) {
+						allPlayers[i].GetAIAStar().SetTarget(allPlayers[i].GetFormationLocation());
+					}
+					//Debug.Log($"{allPlayers[i].name} at {allPlayers[i].transform.position} has not transitioned to {allPlayers[i].GetFormationLocation()}");
 					break;
 				}
 
 				if (i == allPlayers.Count - 1 && Vector2.Distance(allPlayers[i].GetFormationLocation(), allPlayers[i].transform.position) < .05f) {
 					_haveAllPlayersTransitioned = true;
 					break;
+				}
+				
+				if (_lastPlayerPos.Count < i + 1) {
+					_lastPlayerPos.Add(allPlayers[i].transform.position);
+				} else {
+					_lastPlayerPos[i] = allPlayers[i].transform.position;
 				}
 			}
 
@@ -411,19 +439,34 @@ public class GameManager : NetworkBehaviour {
 		yield return new WaitForSeconds(.3f);
 		Debug.Log("All players have transitioned");
 		SetIsTransitioning(false);
+		ball.Reset(true);
 	}
 	
 	IEnumerator CheckPlayerHasTransitioned() {
 		Debug.Log("Starting Check for player has transitioned");
 		//Debug.Log("At least one player found.  Checking if has transitioned");
 		bool _hasPlayerTransitioned = false;
+		yield return new WaitUntil(() => NetworkedPlayerList.ContainsKey(NetworkManager.Singleton.LocalClientId));
+		Player _currentPlayer = NetworkedPlayerList[NetworkManager.Singleton.LocalClientId];
+		Vector2 _lastPlayerPos = _currentPlayer.transform.position;
 		while (!_hasPlayerTransitioned) {
-			yield return new WaitUntil(() => NetworkedPlayerList.ContainsKey(NetworkManager.Singleton.LocalClientId));
-			float _distanceToFormationLocation = Vector2.Distance(NetworkedPlayerList[NetworkManager.Singleton.LocalClientId].GetFormationLocation(), NetworkedPlayerList[NetworkManager.Singleton.LocalClientId].transform.position);
-			Debug.Log($"{_distanceToFormationLocation} transition distance for {NetworkedPlayerList[NetworkManager.Singleton.LocalClientId].name} to {NetworkedPlayerList[NetworkManager.Singleton.LocalClientId].GetFormationLocation()}");
-			if (_distanceToFormationLocation <= .05f) {
+			Vector2 _playerPos = _currentPlayer.transform.position;
+			float _distanceToFormationLocation = Vector2.Distance(_currentPlayer.GetFormationLocation(), _playerPos);
+			
+
+			Debug.Log($"{_distanceToFormationLocation} transition distance for {_currentPlayer.name} to {_currentPlayer.GetFormationLocation()}");
+			if (_distanceToFormationLocation > .05f) {
+				if (_lastPlayerPos == _playerPos) {
+					_currentPlayer.GetAIAStar().SetTarget(_currentPlayer.GetFormationLocation());
+					
+					Debug.Log($"Going to formation location. IsTransitioning: {GetIsTransitioning()} | CanMove: {GetCanMove()} | NetId: {NetworkManager.Singleton.LocalClientId} | PlayerId: {_currentPlayer.OwnerClientId}");
+				}
+
+				_lastPlayerPos = _playerPos;
+			} else {
 				_hasPlayerTransitioned = true;
 			}
+			
 			yield return new WaitForSeconds(dataCollectionRate);
 		}
 
@@ -530,7 +573,7 @@ public class GameManager : NetworkBehaviour {
 	}
 
 	private void Update() {
-		if (!IsGameSetup) {
+		if (IsServer && !IsGameSetup) {
 			return;
 		}
 		UpdateTimer();
@@ -752,22 +795,26 @@ public class GameManager : NetworkBehaviour {
 		return isTraining;
 	}
 
-	public void SetGameState(GameState _value) {
+	public void SetGameState(GameState _value, float _matchTime = 0) {
 		if(!IsServer) return;
-		PropogateGameStateToClients(_value);
+		PropogateGameStateToClients(_value, _matchTime);
 	}
 
-	private void PropogateGameStateToClients(GameState _value) {
+	private void PropogateGameStateToClients(GameState _value, float _matchTime = 0) {
 		if (_value == GameState.Goal) {
 			PropogateGoalToClients();
 		}
-		SetGameStateClientRpc(Utils.GetEnumIndex(_value));
+		SetGameStateClientRpc(Utils.GetEnumIndex(_value), _matchTime);
+		PropogateTimeToClients(timer);
 	}
 	
 	[ClientRpc]
-	public void SetGameStateClientRpc(int _gameStateInt) {
+	public void SetGameStateClientRpc(int _gameStateInt, float _matchTime = 0) {
+		if (_matchTime > 0) {
+			timer = _matchTime;
+		}
 		GameState _value = Utils.GetEnumValueByIndex<GameState>(_gameStateInt);
-		if((_value == GameState.Kickoff && timer != maxTime) && (_value == currentGameState && _value != GameState.Training)) {
+		if((_value == GameState.Kickoff && timer != matchDuration) && (_value == currentGameState && _value != GameState.Training)) {
 			return;
 		}
 		currentGameState = _value;
@@ -803,6 +850,7 @@ public class GameManager : NetworkBehaviour {
 			case GameState.End:
 				canMove = false;
 				ball.Reset(false);
+				lobbyButton.SetActive(true);
 				List<Player> _winningTeamPlayers = homeScore > awayScore ? homePlayers : awayPlayers;
 				foreach (Player _player in allPlayers) {
 					_player.Reset();
@@ -937,6 +985,14 @@ public class GameManager : NetworkBehaviour {
 		}
 	}
 
+	public void ReturnToLobby() {
+		//return to scene "MainMenu"
+		//NetworkManager.Singleton.StopClient();
+		LobbyOrchestrator.PlayersInLobby.Clear();
+		NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
+		SceneManager.LoadScene("MainMenu");
+	}
+
 	public bool IsBallHeadedTowardsGoal(Team team) {
 		foreach(Collider2D col in projectedBallCollisionObjects) {
 			if (col.CompareTag(team == Team.Home ? "homegoal" : "awaygoal")) {
@@ -951,7 +1007,7 @@ public class GameManager : NetworkBehaviour {
 		canMove = true;
 		homeScore = 0;
 		awayScore = 0;
-		timer = maxTime;
+		timer = matchDuration;
 		UpdateScoreBoard();
 		StartCoroutine(Whistle());
 	}

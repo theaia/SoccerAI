@@ -152,7 +152,14 @@ public class Ball : NetworkBehaviour
 			}
 			
 		} else {
-			transform.position = netState.Value.Position;
+			//Client
+			//If Client has ball, use it's own position
+			if(ballCarrier != null && ballCarrier.OwnerClientId == NetworkManager.Singleton.LocalClientId) {
+				transform.position = Vector3.Lerp(transform.position, (Vector2)ballCarrier.transform.position + ballCarrier.targetBallPosition, ballCarryingLerpSpeed * Time.deltaTime);
+			} else {
+				transform.position = netState.Value.Position;
+			}
+
 		}
 	}
 

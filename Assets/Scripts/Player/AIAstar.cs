@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Pathfinding;
 
@@ -14,8 +15,9 @@ public class AIAstar : MonoBehaviour {
     int currentWaypoint = 0;
     [HideInInspector] public bool reachedEndOfPath;
     [SerializeField] private float nextWaypointDistance = .02f;
+    
 
-    public void Start() {
+    public void Awake() {
         seeker = GetComponent<Seeker>();
         player = GetComponent<Player>();
     }
@@ -27,11 +29,12 @@ public class AIAstar : MonoBehaviour {
     public void SetTarget(Vector2 _targetPosition) {
         //Debug.Log($"Setting transition to: {_targetPosition}");
         if(GameManager.Instance && !GameManager.Instance.GetIsTransitioning() && targetPosition.HasValue && Vector2.Distance(_targetPosition, targetPosition.Value) < .04f) {
-            //Debug.Log($"Exiting Set target because target: {targetPosition.HasValue} && target disance to existing is less than .01");
+            //Debug.Log($"Exiting Set target because target: {targetPosition.HasValue} && target distance to existing is less than .01");
             return;
 		}
 
-        if(_targetPosition == targetPosition) {
+        if(_targetPosition == targetPosition && path != null) {
+            //Debug.Log($"{_targetPosition} == {targetPosition}. Returning;");
             return;
 		}
 
@@ -51,11 +54,14 @@ public class AIAstar : MonoBehaviour {
     }
 
 	private void Update() {
+        if (!GameManager.Instance) {
+            return;
+        }
 		if (targetPosition == null || !GameManager.Instance.GetCanMove()) {
+            //Debug.Log($"{targetPosition == null} || {!GameManager.Instance.GetCanMove()}");
             return;
 		}
         ProcessPath();
-        if(transform)
         if (!reachedEndOfPath && path != null) {
             Vector3 _target = path.vectorPath[currentWaypoint];
             Vector3 dir = _target - transform.position;
@@ -77,9 +83,6 @@ public class AIAstar : MonoBehaviour {
     }
 
 	private void ProcessPath() {
-		if (!seeker) {
-            return;
-		}
 
         /*if (Time.time > lastRepath + repathRate && seeker.IsDone()) {
             lastRepath = Time.time;
@@ -90,6 +93,8 @@ public class AIAstar : MonoBehaviour {
         }*/
 
         if (path == null) {
+            //Debug.Log($"No Path. returning");
+            GoToTargetPosition();
             // We have no path to follow yet, so don't do anything
             return;
         }
@@ -123,7 +128,13 @@ public class AIAstar : MonoBehaviour {
     }
 
     private void GoToTargetPosition() {
-        if(seeker != null && targetPosition.HasValue) seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
+        if (targetPosition.HasValue) {
+            //Debug.Log($"Going to target Pos {targetPosition.Value}");
+            if(!seeker) seeker = GetComponent<Seeker>();
+            seeker.StartPath(transform.position, targetPosition.Value, OnPathComplete);
+        } else {
+            //Debug.Log($"Target position doesn't have a value");
+        }
     }
 
     public void OnPathComplete(Path p) {

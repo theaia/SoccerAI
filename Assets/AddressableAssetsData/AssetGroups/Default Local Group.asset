@@ -69,6 +69,10 @@ MonoBehaviour:
     m_Address: Armenia
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 2da3dcc22749e7f4280737786d898334
+    m_Address: Console
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 91cf6397344e07846a1f4a06d3dde6b3, type: 2}
   m_SchemaSet:

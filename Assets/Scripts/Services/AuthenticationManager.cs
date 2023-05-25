@@ -1,4 +1,3 @@
-using ParrelSync;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
