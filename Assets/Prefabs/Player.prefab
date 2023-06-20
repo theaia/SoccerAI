@@ -116,6 +116,20 @@ MonoBehaviour:
   tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   graphMask:
     value: -1
+--- !u!114 &5596696272871210305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5439998628514048567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22633548f5a44074e8bcf1ad6780af0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reachedEndOfPath: 0
+  nextWaypointDistance: 0.02
 --- !u!114 &8026611887216805843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,17 +172,3 @@ MonoBehaviour:
   slowWhenNotFacingTarget: 1
   whenCloseToDestination: 0
   constrainInsideGraph: 0
---- !u!114 &5596696272871210305
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5439998628514048567}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22633548f5a44074e8bcf1ad6780af0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  reachedEndOfPath: 0
-  nextWaypointDistance: 0.02

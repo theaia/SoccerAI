@@ -8,7 +8,7 @@ public enum Team {
 public class Goal : MonoBehaviour
 {
     [SerializeField] private Team team;
-	[SerializeField] private Transform post0, post1;
+	[HideInInspector] public Transform post0, post1;
 
 	
 

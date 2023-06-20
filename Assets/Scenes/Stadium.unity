@@ -490,10 +490,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentGameState: 2
-  homePrefab: {fileID: 9078275708586084584, guid: dcbafbede0ff2be408f9d268fbbf34dc, type: 3}
-  awayPrefab: {fileID: 9078275708586084584, guid: dcbafbede0ff2be408f9d268fbbf34dc, type: 3}
-  homeFormationPrefab: {fileID: 675884908639035132, guid: 52f721950d057364088cb5989691caf8, type: 3}
-  awayFormationPrefab: {fileID: 675884908639035132, guid: 52f721950d057364088cb5989691caf8, type: 3}
+  homePrefab: {fileID: 9078275708586084584, guid: a3aad6211eedff345b524355cd6af662, type: 3}
+  awayPrefab: {fileID: 9078275708586084584, guid: 7f4aa88ca246c6a469893a9382ce186f, type: 3}
+  homeFormationPrefab: {fileID: 675884908639035132, guid: 29b28bdc283729542a7626ada8d946a8, type: 3}
+  awayFormationPrefab: {fileID: 675884908639035132, guid: a47502d15e2fa1d43bf2393deda8e8d0, type: 3}
   homeScoreText: {fileID: 745946609}
   awayScoreText: {fileID: 1743859379}
   timerText: {fileID: 93050186}

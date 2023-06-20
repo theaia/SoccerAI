@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour {
 	private int homeScore;
 	private int awayScore;
 	private Team lastScoringTeam;
+	private Player lastScorer;
 	private float timer;
 	private float maxTime = 3f * 60f;
 	[Header("General")]
@@ -162,6 +163,10 @@ public class GameManager : MonoBehaviour {
 
 	public bool GetIsTransitioning() {
 		return TransitioningToFaceoffPos;
+	}
+
+	public Player GetScorer() {
+		return lastScorer;
 	}
 
 	public void SetIsTransitioning(bool _value) {
@@ -408,7 +413,10 @@ public class GameManager : MonoBehaviour {
 			_scorer = ball.GetScorer(Team.Away);
 		}
 
-		if (_scorer) RewardScoringAgent(_scorer);
+		if (_scorer) {
+			RewardScoringAgent(_scorer);
+			lastScorer = _scorer;
+		}
 
 		if (isOvertime) {
 			SetGameState(GameState.End);
@@ -486,8 +494,8 @@ public class GameManager : MonoBehaviour {
 		"De Bruyne",
 		"Lewandowski",
 		"Neuer",
-		"Suárez",
-		"Agüero",
+		"SuÃ¡rez",
+		"AgÃ¼ero",
 		"Modric",
 		"Hazard",
 		"Sterling",

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
@@ -12,6 +13,11 @@ public class Ball : MonoBehaviour
 	[SerializeField] int BallSpeedAtMaxFrameRate = 1;
 	[SerializeField] float ballCarryingLerpSpeed = 1;
 	[SerializeField] float maxDifferentalForShot = .1f;
+	[SerializeField] AudioSource ballCollisionSound;
+	[SerializeField] AudioSource ballPostSound;
+	[SerializeField] AudioSource ballPickupSound;
+	[SerializeField] private List<Transform> postLocations = new List<Transform>();
+	
 	private int currentFrame;
 	private int currentAnimFrame;
 	private SpriteRenderer rend;
@@ -30,6 +36,12 @@ public class Ball : MonoBehaviour
 		rb = GetComponent<Rigidbody2D>();
 		col = GetComponent<Collider2D>();
 		rend = GetComponent<SpriteRenderer>();
+		
+		Goal[] _goals = FindObjectsOfType<Goal>();
+		foreach(Goal _goal in _goals) {
+			postLocations.Add(_goal.post0);
+			postLocations.Add(_goal.post1);
+		}
 	}
 
 	public void Start() {
@@ -98,6 +110,7 @@ public class Ball : MonoBehaviour
 
 		if (ballCarrier) {
 			lastTouch = ballCarrier;
+			ballPickupSound.Play();
 			shotVector = null;
 			timeoutTimer = 0;
 			SetLastTouch(ballCarrier);
@@ -203,6 +216,16 @@ public class Ball : MonoBehaviour
 		if(collision.gameObject.CompareTag("home") || collision.gameObject.CompareTag("away")) {
 			Player _touchedPlayer = collision.gameObject.GetComponent<Player>();
 			if(_touchedPlayer) SetLastTouch(_touchedPlayer);
+		}
+		
+		if(collision.gameObject.CompareTag("stadium")) {
+			foreach (Transform _transform in postLocations) {
+				if (Vector3.Distance(transform.position, _transform.position) < .2f) {
+					ballPostSound.Play();
+					return;
+				}
+			}
+			ballCollisionSound.Play();
 		}
 	}
 

@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
     [SerializeField] private SpriteRenderer chargeSprite, staminaSprite;
     [HideInInspector] public bool m_CanControl;
     [HideInInspector] public bool IsTransitioning;
+    [SerializeField] private AudioClip[] cheerClips;
+    private AudioSource audioSource;
 
     public PlayerAgent GetAgent() {
         return agent;
@@ -102,6 +104,7 @@ public class Player : MonoBehaviour
         aiaStar = GetComponent<AIAstar>();
         localPerception = GetComponentInChildren<LocalPerception>();
         m_Inputs = GetComponents<KeyboardInput>();
+        audioSource = GetComponent<AudioSource>();
 
         gameObject.name = GameManager.Instance.GetRandomName();
         stamina = GameManager.Instance.maxStamina;
@@ -401,6 +404,10 @@ public class Player : MonoBehaviour
     private void Animate(bool _cheering = false) {
         State _currentState;
 		if (_cheering) {
+            if (GameManager.Instance.GetScorer() == this && !audioSource.isPlaying) {
+                audioSource.clip = cheerClips[Random.Range(0, cheerClips.Length)];
+                audioSource.Play();
+            }
 			_currentState = State.cheer;
 		} else if (!GameManager.Instance.GetCanMove()) {
 			_currentState = State.idle;
