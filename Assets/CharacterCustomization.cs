@@ -11,6 +11,7 @@ public class CharacterCustomization : MonoBehaviour {
 	}
 	IEnumerator Start() {
 		yield return new WaitUntil(() => GameManager.Instance);
+		yield return new WaitForEndOfFrame();
 		Instantiate(GameManager.Instance.GetRandomSkin(), transform);
 		CountryInfo _countryInfo = GameManager.Instance.GetCountryInfo(player.GetTeam());
 		yield return new WaitUntil(() => _countryInfo != null);

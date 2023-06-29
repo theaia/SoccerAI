@@ -15,7 +15,7 @@ MonoBehaviour:
   Country: 5
   Abbreviation: USA
   Flag: {fileID: 89457709, guid: f1387c09a73b72145b0cc0b4921c72a8, type: 3}
-  HomeJerseyColor: {r: 0.990566, g: 0.990566, b: 0.990566, a: 1}
-  HomeTrunksColor: {r: 0.1254902, g: 0.28627452, b: 0.854902, a: 1}
-  AwayJerseyColor: {r: 0.1254902, g: 0.28627452, b: 0.854902, a: 1}
-  AwayTrunksColor: {r: 1, g: 0.19607845, b: 0.2784314, a: 1}
+  HomeJerseyColor: {r: 0.1254902, g: 0.28627452, b: 0.854902, a: 1}
+  HomeTrunksColor: {r: 1, g: 0.19607845, b: 0.2784314, a: 1}
+  AwayJerseyColor: {r: 1, g: 0.19607845, b: 0.2784314, a: 1}
+  AwayTrunksColor: {r: 0.1254902, g: 0.28627452, b: 0.854902, a: 1}

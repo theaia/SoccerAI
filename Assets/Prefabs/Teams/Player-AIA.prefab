@@ -57,7 +57,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5439998628514048719, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
       propertyPath: country
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5461231748367251779, guid: 37603216df6c7bd48a480aa11a69fde7, type: 3}
       propertyPath: detailedGizmos

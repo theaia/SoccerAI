@@ -5,19 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="db9dfbab-5c2d-4507-8679-d38cc695d9ea" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/AIAFormations.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/AIAFormations.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Archive/PlayerBase.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Archive/PlayerBase.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Ball.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Ball.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player-AIA.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player-AIA.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.SoccerAI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SoccerAI/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterCustomization.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterCustomization.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Countries/USA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Countries/USA.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Teams/Player-AIA.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Teams/Player-AIA.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Stadium.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Stadium.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ball.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ball.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Goal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Goal.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CountryInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CountryInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Textures/flags.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Textures/flags.png.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,7 +198,8 @@
       <workItem from="1685648980099" duration="66000" />
       <workItem from="1685649056326" duration="7000" />
       <workItem from="1687299153687" duration="337000" />
-      <workItem from="1687299532019" duration="5003000" />
+      <workItem from="1687299532019" duration="6051000" />
+      <workItem from="1687924772852" duration="1246000" />
     </task>
     <servers />
   </component>
